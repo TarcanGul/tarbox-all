@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Tarbox!</title>
+    <link rel="stylesheet" href="/css/globals.css"/>
+    <link rel="stylesheet" href="/css/home.css"/>
+</head>
+<body>
+    {{! <nav></nav> }}
+    <div class="status-text"> </div>
+    <main>
+        <div class="page-title">
+            <h1> Tarbox </h1>
+        </div>
+        <form class="main-form">
+            <div class="main-form-name form-section">
+                <h3>Name</h3>
+                <input id="main-form-name-field" type="text" maxlength="15" minlength="3" size="20" placeholder="3-15 characters" required autofocus />
+            </div>
+            <div class="main-form-id form-section">
+                <h3>Game Code</h3>
+                <input id="main-form-id-field" type="text" size="20" placeholder="Tarbox Game Code" required />  
+            </div>
+            <button type="submit" class="tarbox-button">Join Game!</button>
+        </form>
+    </main>
+
+    <script src="/js/home.js"></script>
+</body>
+</html>

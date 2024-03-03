@@ -1,0 +1,84 @@
+main {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+}
+
+.form-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15vw;
+    text-align: center;
+}
+
+.form-section h3 {
+    width: 10vw;
+    color: var(--secondary);
+    font-family:system-ui, 'Helvetica Neue', sans-serif;
+}
+
+.page-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2%;
+    background-color: var(--primary);
+    color: var(--text);
+}
+
+.page-title > h1 {
+    font-size: calc(1.5rem + 4vw);
+}
+
+.main-form {
+    height: 100%;
+}
+
+.main-form .tarbox-button {
+    width: calc(60px + 30vw);
+    height: calc(20px + 10vh);
+    margin-top: 15vh;
+    font-size: calc(6px + 1em);
+
+}
+
+.main-form input {
+    color: var(--text);
+    font-size: calc(14px + 1vw);
+    height: calc(30px + 5vh);
+    width: calc(10px + 60vw);
+}
+
+.main-form h3 {
+    font-size: calc(12px + 1vw);
+}
+
+@keyframes fadeIn {
+    from { 
+        top: -100px;
+    }
+    to { 
+        top: 0;
+    }
+}
+
+@keyframes fadeOut {
+    from { 
+        top: 0;
+    }
+    to { 
+        top: -100px;
+    }
+}
+
+.fade-in-animate {
+    top: -100px;
+    animation: fadeIn 0.25s linear forwards;
+}
+
+.fade-out-animate {
+    top: 0;
+    animation: fadeOut 0.25s linear forwards;
+}
+
