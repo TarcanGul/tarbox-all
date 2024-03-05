@@ -1,5 +1,6 @@
 import React from 'react';
 import { TarboxViewHandler } from '../types';
+import TarboxAppConfig from './config';
 
 class ViewHandlerProvider {
     private viewHandler : TarboxViewHandler | undefined = undefined;
@@ -22,7 +23,7 @@ type TarboxConfig = {
 }
 
 const config : TarboxConfig = {
-    tarboxWebsocketURL: new URL("ws://localhost:8080/ws"),
+    ...TarboxAppConfig,
     viewHandlerProvider: new ViewHandlerProvider()
 };
 
