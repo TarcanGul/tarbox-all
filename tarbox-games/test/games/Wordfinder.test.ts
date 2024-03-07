@@ -1,7 +1,6 @@
 import { toPlayers as mockToPlayers, fromPlayers as mockFromPlayers, getMessageDest as mockRequestToStartDest } from "../../src/renderer/helpers";
 import { PlayerStats, TarboxMessage, TarboxStateHandlers } from "../../src/types";
 import { IPublishParams, StompHeaders } from '@stomp/stompjs';
-// Arrange, act, assert
 
 describe('Wordfinder Tests', () => {
 
@@ -360,7 +359,10 @@ describe('Wordfinder Tests', () => {
         expectedAnswerMap.set('player2', 'answer');
         expectedAnswerMap.set('player3', 'answer3');
 
-        const expectedRanking: [string, PlayerStats][] =  [['player2', { points: 50 }], ['player1', {points: 0}], ['player3', {points: 0}]];
+        const expectedRanking: [string, PlayerStats][] =  [
+            ['player2', { points: 50 }], 
+            ['player1', { points: 20 }], 
+            ['player3', { points: 0 }]];
 
         expect(mockListeners.onAnswer).toHaveBeenCalledWith( {
             answers: expectedAnswerMap,
@@ -417,7 +419,11 @@ describe('Wordfinder Tests', () => {
 
         jest.runAllTimers();
 
-        const expectedRanking: [string, PlayerStats][] =  [['player1', { points: 100 }], ['player2', {points: 100}], ['player3', {points: 0}]];
+        const expectedRanking: [string, PlayerStats][] =  [
+            ['player1', { points: 120 }], 
+            ['player2', { points: 120 }], 
+            ['player3', { points: 40 }]
+        ];
 
         expect(mockListeners.onEnd).toHaveBeenCalledWith( {
             ranking: expectedRanking

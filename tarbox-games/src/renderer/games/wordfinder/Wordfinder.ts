@@ -357,8 +357,12 @@ export class Wordfinder {
             let playerAnswer = answer?.trim().toLowerCase();
             let currentAnswer = this.currentAnswer.trim().toLowerCase();
             if(playerAnswer === currentAnswer) {
-                let playerStats : PlayerStats = this.players.get(player) as PlayerStats; 
+                let playerStats : PlayerStats = this.players.get(player) as PlayerStats;
+                let pickerPlayerStats: PlayerStats = this.players.get(this.currentPicker) as PlayerStats;
+
                 playerStats.points += 50;
+                pickerPlayerStats.points += 20;
+
                 this.players.set(player, playerStats);     
             }
         }   
