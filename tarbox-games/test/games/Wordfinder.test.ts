@@ -1,4 +1,4 @@
-import { toPlayers as mockToPlayers, fromPlayers as mockFromPlayers, getMessageDest as mockRequestToStartDest } from "../../src/games/helpers";
+import { toPlayers as mockToPlayers, fromPlayers as mockFromPlayers, getMessageDest as mockRequestToStartDest } from "../../src/renderer/helpers";
 import { PlayerStats, TarboxMessage, TarboxStateHandlers } from "../../src/types";
 import { IPublishParams, StompHeaders } from '@stomp/stompjs';
 // Arrange, act, assert
@@ -12,6 +12,7 @@ describe('Wordfinder Tests', () => {
 
     const mockReceivedMessageQueue : IPublishParams[] = [];
     const mockSentMessagesQueue: IPublishParams[] = [];
+    const mockWordBank: string[] = ['answer'];
     let mockMessageCallback: ((message) => void) | undefined;
 
     const mockListeners : TarboxStateHandlers = {
@@ -65,6 +66,10 @@ describe('Wordfinder Tests', () => {
             }))
         }));
 
+        jest.useFakeTimers();
+        jest.spyOn(globalThis, 'setTimeout');
+
+
         global.fetch = jest.fn().mockImplementation(async (url: URL, options) => {
             if(!url) {
                 return undefined;
@@ -86,9 +91,6 @@ describe('Wordfinder Tests', () => {
             }
         });
 
-        jest.useFakeTimers();
-        jest.spyOn(global, 'setTimeout');
-
         mockReceivedMessageQueue.length = 0
         mockSentMessagesQueue.length = 0
     })
@@ -104,14 +106,16 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Sanity check: Construction', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         expect(w).not.toBeNull();
     })
 
     it('Create Game Successful', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         jest.spyOn(w, 'setID');
         w.setBaseURL(new URL(TEST_URL));
         const id = await w.createGame();
@@ -121,8 +125,9 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Game Base URL throws error if not set.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         expect(() => w.getBaseURL()).toThrow(Error);
         w.setBaseURL(new URL(TEST_URL));
         expect(w.getBaseURL()).toEqual(new URL(TEST_URL)); 
@@ -149,8 +154,9 @@ describe('Wordfinder Tests', () => {
                     return { mocked : true }
             }
         })
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setBaseURL(new URL(TEST_URL));
         expect(async () => {
             const id = await w.createGame();
@@ -158,8 +164,9 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Websocket request to start sends the right message.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setBaseURL(new URL(TEST_URL));
         const id = await w.createGame();
         w.setupWSClient(TEST_WS);
@@ -174,9 +181,10 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Player add message is handled.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
         const id = await w.createGame();
@@ -205,9 +213,10 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Error message is handled.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
         await w.createGame();
@@ -234,9 +243,10 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Start message is handled.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
         await w.createGame();
@@ -268,9 +278,10 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Done (round end) message is handled.' , async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
         await w.createGame();
@@ -314,9 +325,10 @@ describe('Wordfinder Tests', () => {
     })
 
     it('Answer messages are handled.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder();
+        w.loadWordBank(mockWordBank);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
         await w.createGame();
@@ -359,11 +371,12 @@ describe('Wordfinder Tests', () => {
     })
 
     it('End callback is called with right values.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder(1);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
+        w.loadWordBank(mockWordBank);
         await w.createGame();
         const wClient = w.setupWSClient(TEST_WS);
         wClient.onConnect({
@@ -412,11 +425,12 @@ describe('Wordfinder Tests', () => {
     });
 
     it('onNextRound callback is called with right values.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder(1);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
+        w.loadWordBank(mockWordBank);
         await w.createGame();
         const wClient = w.setupWSClient(TEST_WS);
         wClient.onConnect({
@@ -445,11 +459,12 @@ describe('Wordfinder Tests', () => {
     })
 
     it('wsClient does not connect if gameID is not set.', async () => {
-        const { Wordfinder } = await import("../../src/games/Wordfinder");
+        const { Wordfinder } = await import("../../src/renderer/games/wordfinder/Wordfinder");
         const { Client } = await import('@stomp/stompjs');
         const w = new Wordfinder(1);
         w.setListeners(mockListeners);
         w.setBaseURL(new URL(TEST_URL));
+        w.loadWordBank(mockWordBank);
        
 
         expect(() => {

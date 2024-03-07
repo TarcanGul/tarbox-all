@@ -7,6 +7,7 @@ import babel from '@rollup/plugin-babel';
 import terser from '@rollup/plugin-terser';
 import filesize from 'rollup-plugin-filesize';
 import postcss from 'rollup-plugin-postcss';
+import copy from 'rollup-plugin-copy';
 
 const electronConfig = {
   input: './src/main.ts',
@@ -19,7 +20,12 @@ const electronConfig = {
     typescript(),
     commonjs(),
     resolve(),
-    json()
+    json(),
+    copy({
+      targets: [
+        { src: 'src/data', dest: 'dist' },
+      ]
+    })
   ],
   external: ['electron']
 };
@@ -52,4 +58,29 @@ const reactConfig = {
   ]
 };
 
-export default [electronConfig, reactConfig];
+const preloadConfig = {
+  input: './src/preload.ts',
+  output: {
+    file: './dist/preload.js',
+    format: 'cjs',
+    sourcemap: true
+  },
+  plugins: [
+    typescript(),
+    commonjs(),
+    resolve()
+  ],
+  external: ['electron']
+}
+
+const dataConfig = {
+  input: './src/data',
+  output: {
+    dir: './dist/data'
+  },
+  plugins: [
+    copy()
+  ]
+}
+
+export default [preloadConfig, electronConfig, reactConfig];

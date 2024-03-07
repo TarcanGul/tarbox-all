@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { TarboxViewHandler } from "../../types";
 import { Button, Flex, Center, VStack, Heading, Container, Text, Alert, AlertIcon, useToast } from "@chakra-ui/react";
 import { PALETTE, TEXT } from "../../constants";
 import { appBackgroundGradient } from "../theme";

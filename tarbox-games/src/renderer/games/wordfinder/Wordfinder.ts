@@ -1,7 +1,7 @@
 import { Client } from '@stomp/stompjs';
 import Websocket from 'ws';
-import { PlayerStats, GameUpdateFunction, GameOptions, TarboxMessage, TarboxStateHandlers } from '../types';
-import { getMessageDest, toPlayers, fromPlayers } from './helpers';
+import { PlayerStats, GameUpdateFunction, GameOptions, TarboxMessage, TarboxStateHandlers } from '../../../types';
+import { getMessageDest, toPlayers, fromPlayers } from '../../helpers';
 
 Object.assign(globalThis, { Websocket });
 
@@ -21,6 +21,8 @@ export class Wordfinder {
     private currentPicker = '';
     private baseUrl: URL | undefined;
     private numOfRounds: number;
+
+    private wordBank: string[] = [];
 
     private playerList : string[] = []; // For easier tracking
 
@@ -43,7 +45,6 @@ export class Wordfinder {
         this.answerMap = new Map<string, string>();
         this.isActive = true;
         this.numOfRounds = numOfRounds || this.DEFAULT_NUM_OF_ROUNDS;
-        
 
         this.handleGameUpdates = this.handleGameUpdates.bind(this);
     }
@@ -65,6 +66,10 @@ export class Wordfinder {
             throw new Error(URL_ERROR);
         }
         return this.baseUrl;
+    }
+
+    public loadWordBank(wordBank: string[]) : void {
+        this.wordBank = wordBank;
     }
 
     public setListeners(listeners: TarboxStateHandlers) {
@@ -171,7 +176,6 @@ export class Wordfinder {
                     time: Date.now()
                 }
 
-                this.setCurrentAnswer(messageJSON.word);
                 this.publishMessageToPlayers(notifyPlayerPicked);
 
                 this.onDone?.(messageJSON.player, this.getAllPlayerStats());
@@ -263,19 +267,35 @@ export class Wordfinder {
         }
 
 
-        const currentPicker : string = this.playerList[this.currentPickedIndex];
+        const currentPicker = this.playerList[this.currentPickedIndex];
+        const currentWord = this.getNextWordForRound();
         const pickedPlayerMessage = {
             status: 'PICKED',
             gameId: this.gameID,
             time: Date.now(),
             player: currentPicker,
+            word: currentWord,
             message: `${currentPicker} is picked.`
         }
     
         this.publishMessageToPlayers(pickedPlayerMessage);
 
         this.currentPicker = currentPicker;
+        this.setCurrentAnswer(currentWord);
         this.onBeginNextRound?.(this.currentPicker, this.getAllPlayerStats());
+    }
+    
+    private getNextWordForRound() {
+        if(this.wordBank.length === 0) {
+            throw new Error('Load bank is not loaded.');
+        }
+        const randomNum = Math.floor(Math.random() * this.wordBank.length);
+        return this.wordBank[randomNum];
+    }
+
+    // min and max are integers
+    private getRandomInt(min: number, max: number) {
+
     }
 
     private playerExists(player: string) : Boolean {

@@ -1,10 +1,10 @@
 import React, { ReactElement, useContext, useEffect, useRef, useState } from "react";
-import { WordfinderBuilder } from "../../games/builders/WordfinderBuilder";
+import { WordfinderBuilder } from "../games/wordfinder/WordfinderBuilder";
 import { PlayerStats, TarboxViewHandler } from "../../types";
 import { Text, Spinner, List, ListItem, Heading, Box, Button, useToast, Container, VStack, Center, HStack, Flex, Tooltip, Square, Spacer } from '@chakra-ui/react';
 import { PALETTE } from "../../constants";
 import { appBackgroundGradient } from "../theme";
-import { Wordfinder } from "../../games/Wordfinder";
+import { Wordfinder } from "../games/wordfinder/Wordfinder";
 import AppContext from "../AppContext";
 
 interface PointBarProps {

@@ -1,5 +1,5 @@
-import { TarboxStateHandlers } from "../../types";
-import { Wordfinder } from "../Wordfinder";
+import { TarboxStateHandlers } from "../../../types";
+import { Wordfinder } from "./Wordfinder";
 
 
 export class WordfinderBuilder {
@@ -33,6 +33,12 @@ export class WordfinderBuilder {
         return this;
     }
 
+    private async loadBank(type: string) : Promise<string[]> {
+        // @ts-ignore
+        const resultBank : string[] = await globalThis.electron.tarboxRemoteProcedures.loadWordBank(type); // Returns list of words.
+        return resultBank;
+    }
+
     public async build() : Promise<Wordfinder> {
         if(!this.listeners) {
             throw new Error("No handlers are set for the game object.");
@@ -49,7 +55,11 @@ export class WordfinderBuilder {
         this.gameInstance.setID(gameID);
 
         this.gameInstance.setupWSClient(this.wsBrokerUrl);
-        
+
+        const wordBank = await this.loadBank('basic');
+
+        this.gameInstance.loadWordBank(wordBank);
+
         return this.gameInstance;
     }
 }

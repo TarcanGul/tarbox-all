@@ -41,3 +41,7 @@ export type TarboxStateHandlers = {
     onBeginNextRound: (...args: any) => void;
     onStart: (...args:any) => void;
 }
+
+type TarboxRPCCalls = {
+    loadWordBank: () => Promise<any>
+ }
