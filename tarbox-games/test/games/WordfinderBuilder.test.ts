@@ -1,4 +1,3 @@
-import { electron } from 'process';
 import { TarboxStateHandlers } from '../../src/types';
 
 
