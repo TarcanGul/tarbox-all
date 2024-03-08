@@ -1,6 +1,6 @@
 import React from 'react';
 import { TarboxViewHandler } from '../types';
-import TarboxAppConfig from './config';
+import tarboxAppConfig from './config';
 
 class ViewHandlerProvider {
     private viewHandler : TarboxViewHandler | undefined = undefined;
@@ -23,7 +23,7 @@ type TarboxConfig = {
 }
 
 const config : TarboxConfig = {
-    ...TarboxAppConfig,
+    ...tarboxAppConfig,
     viewHandlerProvider: new ViewHandlerProvider()
 };
 

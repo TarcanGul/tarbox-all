@@ -9,8 +9,6 @@ const URL_ERROR = "Base URL is not set.";
 const GAME_INIT_ERROR = "Game ID is not initialized while creating the WS client.";
 
 export class Wordfinder {
-    private isActive: boolean;
-
     private wsClient: Client | undefined;
     private currentAnswer: string;
     private currentPickedIndex = 0;
@@ -20,11 +18,9 @@ export class Wordfinder {
     private answerMap: Map<string, string>;
     private currentPicker = '';
     private baseUrl: URL | undefined;
-    private numOfRounds: number;
-
+    private totalNumOfRounds: number;
     private wordBank: string[] = [];
-
-    private playerList : string[] = []; // For easier tracking
+    private playerList : string[] = [];
 
     private DEFAULT_NUM_OF_ROUNDS = 3;
 
@@ -43,8 +39,7 @@ export class Wordfinder {
         this.gameID = '';
         this.players = new Map<string, PlayerStats>();
         this.answerMap = new Map<string, string>();
-        this.isActive = true;
-        this.numOfRounds = numOfRounds || this.DEFAULT_NUM_OF_ROUNDS;
+        this.totalNumOfRounds = numOfRounds || this.DEFAULT_NUM_OF_ROUNDS;
 
         this.handleGameUpdates = this.handleGameUpdates.bind(this);
     }
@@ -127,7 +122,6 @@ export class Wordfinder {
 
         wsClient.onDisconnect = (frame: any) => {
             console.log('disconnected');
-            wsClient.unsubscribe(fromPlayers(this.gameID));
         }
 
         wsClient.onWebSocketError = (error : string) => {
@@ -240,7 +234,7 @@ export class Wordfinder {
         this.currentPicker = '';
 
         if(this.currentPickedIndex >= this.playerList.length) {
-            if(this.currentRound >= this.numOfRounds) {
+            if(this.currentRound >= this.totalNumOfRounds) {
                 // The game has ended.
 
                 const gameEndedMessage = {
@@ -255,7 +249,6 @@ export class Wordfinder {
                 });
 
                 // Disconnect everyone. End the game.
-                this.wsClient?.deactivate();
                 this.endGame();
 
                 return;
@@ -403,7 +396,7 @@ export class Wordfinder {
         });
 
         if(res.ok) {
-            this.isActive = false;
+            await this.wsClient?.deactivate();
         }
     }
 

@@ -1,4 +1,5 @@
 import { TarboxStateHandlers } from "../../../types";
+import tarboxAppConfig from "../../config";
 import { Wordfinder } from "./Wordfinder";
 
 
@@ -9,7 +10,7 @@ export class WordfinderBuilder {
     private listeners: TarboxStateHandlers | undefined = undefined;
     private wsBrokerUrl: URL | undefined = undefined;
 
-    private tarboxServerUrl = new URL("http://localhost:8080");
+    private tarboxServerUrl = tarboxAppConfig.tarboxServerUrl;
 
     constructor() {
         this.gameInstance = undefined;
