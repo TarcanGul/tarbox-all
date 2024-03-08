@@ -5,6 +5,7 @@ class PickedView extends HTMLElement {
 
     // Attributes
     #formCallback;
+    #answerWord;
 
     connectedCallback() {
 
@@ -15,6 +16,13 @@ class PickedView extends HTMLElement {
       
         promptArea.className = 'promptArea';
         wordArea.className = 'wordArea';
+
+        const wordLabel = document.createElement('label');
+        const wordDisplay = document.createElement('p');
+        wordDisplay.textContent = this.#answerWord;
+      
+        wordArea.appendChild(wordLabel);
+        wordArea.appendChild(wordDisplay);
       
         const promptLabel = document.createElement('label');
         const promptInput = document.createElement('textarea');
@@ -24,29 +32,20 @@ class PickedView extends HTMLElement {
         promptArea.appendChild(promptLabel);
         promptArea.appendChild(promptInput);
       
-        const wordLabel = document.createElement('label');
-        const wordInput = document.createElement('input');
-        wordInput.name = 'word';
-        wordInput.type = 'text';
-        wordInput.required = true;
-      
-        wordArea.appendChild(wordLabel);
-        wordArea.appendChild(wordInput);
-      
         promptLabel.textContent = 'Pick a prompt!';
-        wordLabel.textContent = 'Pick a word!';
-      
-        pageForm.appendChild(promptArea);
+        wordLabel.textContent = 'The word you are describing is...';
+
         pageForm.appendChild(wordArea);
+        pageForm.appendChild(promptArea);
+
       
         const pageButton = document.createElement('button');
         pageButton.type = 'submit';
         pageButton.textContent = 'Submit';
-        pageButton.classList.add('tarbox-button')
+        pageButton.classList.add('tarbox-button');
       
         pageForm.appendChild(pageButton);
 
-        console.log(this.#formCallback);
         if(this.#formCallback) {
             this.#formCallback.bind(this);
         }
@@ -62,6 +61,10 @@ class PickedView extends HTMLElement {
 
     set formCallback(value) {
         this.#formCallback = value;
+    }
+
+    set answerWord(value) {
+        this.#answerWord = value;
     }
 }
 

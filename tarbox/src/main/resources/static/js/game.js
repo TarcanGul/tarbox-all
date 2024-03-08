@@ -111,18 +111,14 @@ async function updateUI(current) {
       }
       if(current.message.player === current.currentPlayer) {
         const pickedView = document.createElement('picked-view');
+        const pickedWord = current.message.word;
+        pickedView.answerWord = pickedWord;
         pickedView.formCallback = function (e) {
           e.preventDefault();
 
           let formData = new FormData(this);
 
-          let word = formData.get('word');
           let prompt = formData.get('prompt');
-
-          if(word.trim() === '') {
-            notify('Word cannot be empty!');
-            return false;
-          }
 
           if(prompt.trim() === '') {
             notify('Prompt cannot be empty!');
@@ -131,7 +127,7 @@ async function updateUI(current) {
 
           const sendDataBody = {
             status: 'DONE',
-            word: word,
+            word: pickedWord,
             prompt: prompt,
             gameId: current.game,
             player: current.currentPlayer,
@@ -147,7 +143,7 @@ async function updateUI(current) {
       }
       else {
         const waitingView = document.createElement('waiting-view');
-        waitingView.message = `Waiting for ${current.message.player} to pick a word...`;
+        waitingView.message = `Waiting for ${current.message.player} to pick a prompt...`;
         pageFrame.appendChild(waitingView);
       }
       break;
