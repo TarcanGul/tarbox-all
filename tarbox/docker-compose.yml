@@ -1,5 +1,6 @@
+version: '1'
 services:
-  postgres:
+  tarboxdb:
     image: "postgres:16.2"
     restart: unless-stopped
     environment:
@@ -8,3 +9,17 @@ services:
       - POSTGRES_DB=tarbox
     ports:
       - "5455:5432"
+    networks:
+      - tarbox-network
+  server:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - spring_profiles_active=dev
+    networks:
+      - tarbox-network
+networks:
+  tarbox-network:
+    driver: bridge
