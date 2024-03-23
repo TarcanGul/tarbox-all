@@ -4,4 +4,4 @@ WORKDIR /tarbox-app
 
 COPY . .
 
-CMD [ "./mvnw", "spring-boot:run" ]
+CMD [ "./mvnw", "spring-boot:run", "-Dspring.active.profile=docker" ]

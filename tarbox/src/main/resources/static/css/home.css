@@ -15,7 +15,7 @@ main {
 .form-section h3 {
     width: 10vw;
     color: var(--secondary);
-    font-family:system-ui, 'Helvetica Neue', sans-serif;
+    font-family: 'Fredoka-One', sans-serif;
 }
 
 .page-title {

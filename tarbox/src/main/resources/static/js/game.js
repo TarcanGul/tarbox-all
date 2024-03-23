@@ -17,73 +17,72 @@ const mq = {
 
 function runGame(e) {
     const client = new StompJs.Client({
-        brokerURL: 'ws://localhost:8080/ws',
-        debug: function (str) {
-          console.log(str);
-        },
-        reconnectDelay: 5000,
-        heartbeatIncoming: 4000,
-        heartbeatOutgoing: 4000,
-      });
+      brokerURL: 'ws://localhost:8080/ws',
+      debug: function (str) {
+        console.log(str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+    });
+    client.onConnect = async function (frame) {
+      // Do something, all subscribes must be done is this callback
+      // This is needed because this will be executed after a (re)connect
       
-      client.onConnect = async function (frame) {
-        // Do something, all subscribes must be done is this callback
-        // This is needed because this will be executed after a (re)connect
-        
-        const gameId = document.cookie
-          .split("; ")
-          .find((val) => val.startsWith("tarbox_gameid="))
-          ?.split('=')[1];
-
-        const playerName = document.cookie
+      const gameId = document.cookie
         .split("; ")
-        .find((val) => val.startsWith("tarbox_username="))
+        .find((val) => val.startsWith("tarbox_gameid="))
         ?.split('=')[1];
 
-        if(gameId === undefined) {
-          return new Error("Game id cannot be retrieved.");
-        }
+      const playerName = document.cookie
+      .split("; ")
+      .find((val) => val.startsWith("tarbox_username="))
+      ?.split('=')[1];
 
-        // Check if already notified.
-        
-        notifyPlayerEntry(client, gameId, playerName);
-
-        const gameStateResponse = await fetch(`/api/games/${gameId}/state`);
-        const gameStateJSON = await gameStateResponse.json();
-        const currentStatus = gameStateJSON.status;
-
-        await updateUI({
-          status: currentStatus,
-          game: gameId,
-          currentPlayer: playerName
-        });
-
-        const subscription = client.subscribe(`/game/${gameId}/actions`, async (message) => {
-            if (message.body) {
-                mq.queue.push(message);
-                if(!mq.isProcessing) {
-                  await processMessage(gameId, client, playerName);
-                }
-            } else {
-                console.log('got empty message');
-            }
-        });
-      };
-      
-      client.onStompError = function (frame) {
-        // Will be invoked in case of error encountered at Broker
-        // Bad login/passcode typically will cause an error
-        // Complaint brokers will set `message` header with a brief message. Body may contain details.
-        // Compliant brokers will terminate the connection after any error
-        console.log('Broker reported error: ' + frame.headers['message']);
-        console.log('Additional details: ' + frame.body);
-      };
-
-      client.onDisconnect = async function(frame) {
-        await updateUI({status: "DISCONNECTED"});
+      if(gameId === undefined) {
+        return new Error("Game id cannot be retrieved.");
       }
+
+      // Check if already notified.
       
-      client.activate();
+      notifyPlayerEntry(client, gameId, playerName);
+
+      const gameStateResponse = await fetch(`/api/games/${gameId}/state`);
+      const gameStateJSON = await gameStateResponse.json();
+      const currentStatus = gameStateJSON.status;
+
+      await updateUI({
+        status: currentStatus,
+        game: gameId,
+        currentPlayer: playerName
+      });
+
+      const subscription = client.subscribe(`/game/${gameId}/actions`, async (message) => {
+          if (message.body) {
+              mq.queue.push(message);
+              if(!mq.isProcessing) {
+                await processMessage(gameId, client, playerName);
+              }
+          } else {
+              console.log('got empty message');
+          }
+      });
+    };
+    
+    client.onStompError = function (frame) {
+      // Will be invoked in case of error encountered at Broker
+      // Bad login/passcode typically will cause an error
+      // Complaint brokers will set `message` header with a brief message. Body may contain details.
+      // Compliant brokers will terminate the connection after any error
+      console.log('Broker reported error: ' + frame.headers['message']);
+      console.log('Additional details: ' + frame.body);
+    };
+
+    client.onDisconnect = async function(frame) {
+      await updateUI({status: "DISCONNECTED"});
+    }
+    
+    client.activate();
 }
 
 /**

@@ -16,8 +16,6 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
-    environment:
-      - spring_profiles_active=dev
     networks:
       - tarbox-network
 networks:
