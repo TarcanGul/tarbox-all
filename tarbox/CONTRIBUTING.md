@@ -10,6 +10,5 @@
 To run the server:
 
 - Run `docker compose up` in the tarbox folder.
-- Run `./mvnw spring-boot:run`.
-- The app should be available at localhost:8080
+- The app is available at localhost:8080 (and in the devices connected in the same network)
 

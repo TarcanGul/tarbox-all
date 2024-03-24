@@ -8,8 +8,6 @@ game.appendChild(pageFrame);
 
 const toGameServer = (gameId) => `/game/${gameId}/events/server`;
 
-const BASE_URL = 'http://localhost:8080';
-
 const mq = {
   queue: [],
   isProcessing: false
@@ -17,7 +15,7 @@ const mq = {
 
 function runGame(e) {
     const client = new StompJs.Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: getWebsocketServer(),
       debug: function (str) {
         console.log(str);
       },
@@ -68,6 +66,10 @@ function runGame(e) {
           }
       });
     };
+
+    client.onWebSocketError = (event) => {
+      notify(event + "Trying again...");
+    }
     
     client.onStompError = function (frame) {
       // Will be invoked in case of error encountered at Broker
@@ -254,6 +256,14 @@ function clearGame() {
     pageFrame.removeChild(pageFrame.firstChild);
   }
 }
+
+function getWebsocketServer() {
+  const wsServer = new URL('/ws', window.location.origin).href;
+  const resultWSURL = wsServer.replace('http://', 'ws://');
+  console.log(`Connecting to ${resultWSURL}`);
+  return resultWSURL;
+}
+
 let statusTextIsUp = false;
 
 function notify(text) {
