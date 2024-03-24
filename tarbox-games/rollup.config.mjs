@@ -25,7 +25,8 @@ const electronConfig = {
       targets: [
         { src: 'src/data', dest: 'dist' },
       ]
-    })
+    }),
+    terser()
   ],
   external: ['electron']
 };
@@ -71,16 +72,6 @@ const preloadConfig = {
     resolve()
   ],
   external: ['electron']
-}
-
-const dataConfig = {
-  input: './src/data',
-  output: {
-    dir: './dist/data'
-  },
-  plugins: [
-    copy()
-  ]
 }
 
 export default [preloadConfig, electronConfig, reactConfig];
