@@ -30,4 +30,10 @@ public class MainController {
         model.addAttribute("gameId", gameId);
         return "game";
     }
+
+    @GetMapping("/download")
+    public String downloadPage() {
+        return "forward:/pages/download.html";
+    }
+    
 }

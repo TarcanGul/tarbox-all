@@ -1,7 +1,6 @@
 main {
     text-align: center;
     width: 100%;
-    height: 100%;
 }
 
 .form-section {
@@ -15,21 +14,10 @@ main {
 .form-section h3 {
     width: 10vw;
     color: var(--secondary);
-    font-family: 'Fredoka-One', sans-serif;
+    font-style: italic;
+    font-family: 'pt-sans', sans-serif;
 }
 
-.page-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2%;
-    background-color: var(--primary);
-    color: var(--text);
-}
-
-.page-title > h1 {
-    font-size: calc(1.5rem + 4vw);
-}
 
 .main-form {
     height: 100%;

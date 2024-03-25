@@ -27,10 +27,66 @@ body {
 }
 
 @font-face {
-    font-family: 'Fredoka-One';
-    src: url('../fonts/fredoka-one_5.0.5/webfonts/fredoka-one-latin-400-normal.woff') format('woff');
+    font-family: 'pt-sans';
+    src: url('../fonts/pt-sans_5.0.12/webfonts/pt-sans-latin-400-normal.woff') format('woff');
     font-weight: normal;
     font-style: normal;
+}
+
+@font-face {
+    font-family: 'pt-sans';
+    src: url('../fonts/pt-sans_5.0.12/webfonts/pt-sans-latin-400-italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'pt-sans';
+    src: url('../fonts/pt-sans_5.0.12/webfonts/pt-sans-latin-700-normal.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+.page-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2%;
+    background-color: var(--primary);
+    color: var(--text);
+    width: 100vw;
+    height: fit-content;
+    position: relative;
+}
+
+.page-title > h1 {
+    font-size: calc(1.5rem + 4vw);
+    flex-grow: 1;
+    text-align: center;
+}
+
+.page-title > .page-links {
+    position: absolute;
+    margin-left: 2vw;
+    left: 0;
+    flex-grow: 1;
+    justify-content: space-between;
+    max-width: 25vw;
+}
+
+.page-links > a {
+    font-family: 'pt-sans', sans-serif;
+    font-size: medium;
+    text-decoration: none;
+    transition: transform 0.1s ease-in-out;
+    color: var(--text);
+    display: inline-block;
+    overflow-wrap:break-word;
+}
+
+.page-links > a:hover {
+    background-color: var(--secondary);
+    transform: scale(1.1);
 }
 
 h1 {
@@ -38,18 +94,18 @@ h1 {
 }
 
 h2 {
-    font-family: 'Fredoka-One', sans-serif;
+    font-family: 'pt-sans', sans-serif;
     font-size: 2rem;
     text-align: center;
     color: var(--text);
 }
 
 h3 {
-    font-family: 'Fredoka-One', sans-serif;
+    font-family: 'pt-sans', sans-serif;
 }
 
 p {
-    font-family: 'Fredoka-One', sans-serif;
+    font-family: 'pt-sans', sans-serif;
 }
 
 form {
@@ -71,11 +127,13 @@ textarea {
 }
 
 label {
-    font-family: 'Fredoka-One', system-ui, sans-serif;
+    font-family: 'pt-sans', system-ui, sans-serif;
+    color: var(--text);
 }
 
 input[type=text] {
     padding-left: 1ch;
+    font-family: 'pt-sans', system-ui, sans-serif;
 }
 
 input, textarea {
@@ -92,8 +150,8 @@ input {
     border-radius: 1em;
     background-color: var(--primary);
     color: var(--ternary);
-    font-family:'Fredoka-One', system-ui, sans-serif;
-    font-weight: bolder;
+    font-family:'pt-sans', system-ui, sans-serif;
+    font-weight: bold;
     box-shadow: 0 2px 2px 0 var(--primary-light), 0 6px 10px 0 var(--ternary);
     width: 100px;
     height: 60px;
@@ -118,6 +176,13 @@ input {
     height: fit-content;
     width: 100%;
 }
+
+@media (max-width: 640px) {
+    .hide-in-small {
+        display: none;
+    }
+}
+
 
 @keyframes fadeIn {
     from { 
