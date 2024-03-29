@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
@@ -27,6 +28,7 @@ import tarcan.projects.tarbox.utilities.MaxPlayersReachedException;
 
 @RestController
 @RequestMapping("/api")
+@RateLimiter(name = "tarbox-api")
 public class GameController {
 
     Logger logger = LoggerFactory.getLogger(GameController.class);

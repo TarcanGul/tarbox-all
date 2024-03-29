@@ -6,12 +6,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import tarcan.projects.tarbox.repositories.GameRepository;
 
 /**
  * Web controller for the web views.
  */
 @Controller
+@RateLimiter(name = "tarbox-web")
 public class MainController {
 
     @Autowired
