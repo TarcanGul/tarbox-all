@@ -1,4 +1,4 @@
-window.addEventListener('load', (e) => runGame(e));
+window.addEventListener('load', (e) => runGame());
 
 const game = document.querySelector("main");
 const pageFrame = document.createElement('div');
@@ -13,7 +13,7 @@ const mq = {
   isProcessing: false
 };
 
-function runGame(e) {
+function runGame() {
     const client = new StompJs.Client({
       brokerURL: getWebsocketServer(),
       debug: function (str) {
@@ -61,23 +61,17 @@ function runGame(e) {
               if(!mq.isProcessing) {
                 await processMessage(gameId, client, playerName);
               }
-          } else {
-              console.log('got empty message');
           }
       });
     };
 
     client.onWebSocketError = (event) => {
       notify(event + "Trying again...");
+      client.activate();
     }
     
-    client.onStompError = function (frame) {
-      // Will be invoked in case of error encountered at Broker
-      // Bad login/passcode typically will cause an error
-      // Complaint brokers will set `message` header with a brief message. Body may contain details.
-      // Compliant brokers will terminate the connection after any error
-      console.log('Broker reported error: ' + frame.headers['message']);
-      console.log('Additional details: ' + frame.body);
+    client.onStompError = async function (frame) {
+      await updateUI({status: "ERROR", message: frame.headers['message'], details: frame.body});
     };
 
     client.onDisconnect = async function(frame) {
@@ -210,6 +204,15 @@ async function updateUI(current) {
       disconnectedView.message = "You have been disconnected.";
       pageFrame.appendChild(disconnectedView);
       break;
+    case 'ERROR':
+      const errorView = document.createElement('error-view');
+      if(current.message) {
+        errorView.message = current.message;
+      }
+      if(current.details) {
+        errorView.details = current.details;
+      }
+      pageFrame.appendChild(errorView);
     default:
       const waitingView = document.createElement('waiting-view');
       waitingView.message = `Waiting for the game ${current.game} to start...`;
