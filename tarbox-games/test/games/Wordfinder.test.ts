@@ -24,7 +24,8 @@ describe('Wordfinder Tests', () => {
         onEnd: jest.fn(),
         onError: jest.fn(),
         onPlayerAdd: jest.fn(),
-        onStart: jest.fn()
+        onStart: jest.fn(),
+        onDisconnect: jest.fn()
     };
 
     beforeAll(() => {
@@ -414,6 +415,25 @@ describe('Wordfinder Tests', () => {
         expect(() => {
             const wClient = w.setupWSClient(TEST_WS);
         }).toThrow();
+    })
+
+    it('onDisconnect is called and redirects to home page.', async () => {
+        const w = createWordfinderInstance();
+        w.setListeners(mockListeners);
+        w.setBaseURL(new URL(TEST_URL));
+        w.loadWordBank(mockWordBank);
+        const id = await w.createGame();
+        const wClient = w.setupWSClient(TEST_WS);
+
+        wClient.onDisconnect({
+            command: "",
+            headers: new StompHeaders(),
+            isBinaryBody: false,
+            body: "",
+            binaryBody: new Uint8Array()
+        });
+
+        expect(mockListeners.onDisconnect).toHaveBeenCalled();
     })
 
     const mockAddPlayerMessage = (player: string) => JSON.stringify({

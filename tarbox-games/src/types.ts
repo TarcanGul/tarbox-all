@@ -40,6 +40,7 @@ export type TarboxStateHandlers = {
     onEnd: (...args: any) => void;
     onBeginNextRound: (...args: any) => void;
     onStart: (...args:any) => void;
+    onDisconnect?: (...args:any) => void;
 }
 
 type TarboxRPCCalls = {

@@ -28,7 +28,8 @@ enum WordfinderPage {
     WaitingView,
     WordAndPromptSubmittedView,
     AnsweredView,
-    EndedView
+    EndedView,
+    DisconnectedView
 }
 
 /*****  Wordfinder Pages *****/
@@ -71,6 +72,12 @@ const WordfinderView = () => {
                 },
                 onStart: (players: Map<string, PlayerStats>) => {
                     setViewState((prevViewState : GameState) => ({...prevViewState, playerStatsMap: players}));
+                },
+                onDisconnect: () => {
+                    setTimeout(() => {
+                        viewHandler.home?.();
+                    }, 3000);
+                    setViewState({...viewState, page: WordfinderPage.DisconnectedView});
                 }
             };
 
@@ -96,7 +103,10 @@ const WordfinderView = () => {
         case WordfinderPage.AnsweredView:
             return <AnsweredView ranking={viewState.ranking} answerMap={viewState.answerMap} correctAnswer={viewState.correctAnswer} />;
         case WordfinderPage.EndedView:
-            return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>;
+            return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>
+        case WordfinderPage.DisconnectedView:
+            return <DisconnectedView />;
+            ;
     }
 }
 
@@ -195,6 +205,14 @@ const WaitingView = ( {player, playerStatsMap} : any ) => {
             <PointBar players={playerStatsMap}></PointBar>
         </Flex>
     </Box> 
+}
+
+const DisconnectedView = () => {
+    return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
+        <Center w='inherit' h='80%'>
+            <Heading as='h1' color='whitesmoke'>Disconnected. Going back to home menu.</Heading>
+        </Center>
+    </Box>  
 }
 
 /*****  Helper Components *****/

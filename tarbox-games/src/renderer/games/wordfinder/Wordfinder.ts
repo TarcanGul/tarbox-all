@@ -32,6 +32,7 @@ export class Wordfinder {
     private onEnd : (body : any) => void = () => undefined;
     private onBeginNextRound : (picker: string, stats: Map<string, PlayerStats>) => void = () => undefined;
     private onStart : (players: Map<string, PlayerStats>) => void = () => undefined;
+    private onDisconnect: () => void = () => undefined;
 
     constructor(numOfRounds?: number) {
         // State
@@ -75,6 +76,10 @@ export class Wordfinder {
         this.onEnd = listeners.onEnd;
         this.onBeginNextRound = listeners.onBeginNextRound;
         this.onStart = listeners.onStart;
+
+        if(listeners.onDisconnect) {
+            this.onDisconnect = listeners.onDisconnect;
+        }
     }
 
     public async createGame() : Promise<string> {
@@ -121,16 +126,19 @@ export class Wordfinder {
         };
 
         wsClient.onDisconnect = (frame: any) => {
-            console.log('disconnected');
+            this.onDisconnect?.();
         }
 
         wsClient.onWebSocketError = (error : string) => {
-            console.error('Error with websocket', error);
+            this.onError?.(error);
         };
     
         wsClient.onStompError = (frame : any) => {
-            console.error('Broker reported error ' + frame.headers['message']);
-            console.error('Additional details: ' + frame.body);
+            let consolidatedMessage = frame.headers['message'];
+            if(frame.body) {
+                consolidatedMessage += ' ' + frame.body;
+            }
+            this.onError?.(consolidatedMessage);
         }
 
         wsClient.activate();
@@ -236,13 +244,6 @@ export class Wordfinder {
         if(this.currentPickedIndex >= this.playerList.length) {
             if(this.currentRound >= this.totalNumOfRounds) {
                 // The game has ended.
-
-                const gameEndedMessage = {
-                    status: 'ENDED',
-                    gameId: this.gameID,
-                    time: Date.now()
-                }
-                this.publishMessageToPlayers(gameEndedMessage);
 
                 this.onEnd?.({
                     ranking: this.getRankingForRound()
@@ -395,9 +396,14 @@ export class Wordfinder {
             }
         });
 
-        if(res.ok) {
-            await this.wsClient?.deactivate();
+        const gameEndedMessage = {
+            status: 'ENDED',
+            gameId: this.gameID,
+            time: Date.now()
         }
+
+        this.publishMessageToPlayers(gameEndedMessage);
+        await this.wsClient!.deactivate();
     }
 
     private validateMessage(obj: object, requiredProps: string[]) : void {
