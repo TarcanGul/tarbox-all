@@ -6,6 +6,7 @@ import { DEFAULT_TRANSITION, PALETTE } from "../../constants";
 import { appBackgroundGradient } from "../theme";
 import { Wordfinder } from "../games/wordfinder/Wordfinder";
 import AppContext from "../AppContext";
+import { keyframes } from "@chakra-ui/react";
 
 interface PointBarProps {
     players: Map<string, PlayerStats>
@@ -75,78 +76,85 @@ enum WordfinderPage {
 
 const WordfinderView = () => {
 
-    const [viewState, setViewState] : [GameState, any] = useState({ 
-        page: WordfinderPage.InitialView,
-        gameID: '',
-        players: [],
-        error: '',
-        playerStatsMap: new Map<string, PlayerStats>,
-        currentPlayer: '',
-        ranking: [],
-        answerMap: new Map<string, string>(),
-        correctAnswer: ''
-    });
-    const startHandler = useRef(() => {});
+    // const [viewState, setViewState] : [GameState, any] = useState({ 
+    //     page: WordfinderPage.InitialView,
+    //     gameID: '',
+    //     players: [],
+    //     error: '',
+    //     playerStatsMap: new Map<string, PlayerStats>,
+    //     currentPlayer: '',
+    //     ranking: [],
+    //     answerMap: new Map<string, string>(),
+    //     correctAnswer: ''
+    // });
+    // const startHandler = useRef(() => {});
     const context = useContext(AppContext);
 
     const viewHandler = context.viewHandlerProvider.get();
-    const websocketURL = context.tarboxWebsocketURL;
+    // const websocketURL = context.tarboxWebsocketURL;
 
-    useEffect(() => {
-        const gameSetup = async () => {
-            const handlers = {
-                onError: (message : string) => setViewState({...viewState, error: message}),
-                onPlayerAdd: (player: string) => setViewState((prevViewState : GameState) => ({...prevViewState, players: [...prevViewState.players, player]})),
-                onDone: (player: string, playerStatsMap: Map<string, PlayerStats>) => {
-                    setViewState({...viewState, currentPlayer: player, playerStatsMap: playerStatsMap, page: WordfinderPage.WordAndPromptSubmittedView });
-                },
-                onAnswer: (answerBody: any) => {
-                    setViewState({...viewState, answerMap: answerBody.answers, correctAnswer: answerBody.correctAnswer, ranking: answerBody.ranking, page: WordfinderPage.AnsweredView});
-                },
-                onEnd: (endBody: any) => {
-                    setViewState({...viewState, ranking: endBody.ranking, page: WordfinderPage.EndedView});
-                },
-                onBeginNextRound: (picker:  string, playerStatsMap: Map<string, PlayerStats>) => {
-                    setViewState({...viewState, currentPlayer: picker, page: WordfinderPage.WaitingView, playerStatsMap: playerStatsMap});
-                },
-                onStart: (players: Map<string, PlayerStats>) => {
-                    setViewState((prevViewState : GameState) => ({...prevViewState, playerStatsMap: players}));
-                },
-                onDisconnect: () => {
-                    setTimeout(() => {
-                        viewHandler.home?.();
-                    }, 3000);
-                    setViewState({...viewState, page: WordfinderPage.DisconnectedView});
-                }
-            };
+    // useEffect(() => {
+    //     const gameSetup = async () => {
+    //         const handlers = {
+    //             onError: (message : string) => setViewState({...viewState, error: message}),
+    //             onPlayerAdd: (player: string) => setViewState((prevViewState : GameState) => ({...prevViewState, players: [...prevViewState.players, player]})),
+    //             onDone: (player: string, playerStatsMap: Map<string, PlayerStats>) => {
+    //                 setViewState({...viewState, currentPlayer: player, playerStatsMap: playerStatsMap, page: WordfinderPage.WordAndPromptSubmittedView });
+    //             },
+    //             onAnswer: (answerBody: any) => {
+    //                 setViewState({...viewState, answerMap: answerBody.answers, correctAnswer: answerBody.correctAnswer, ranking: answerBody.ranking, page: WordfinderPage.AnsweredView});
+    //             },
+    //             onEnd: (endBody: any) => {
+    //                 setViewState({...viewState, ranking: endBody.ranking, page: WordfinderPage.EndedView});
+    //             },
+    //             onBeginNextRound: (picker:  string, playerStatsMap: Map<string, PlayerStats>) => {
+    //                 setViewState({...viewState, currentPlayer: picker, page: WordfinderPage.WaitingView, playerStatsMap: playerStatsMap});
+    //             },
+    //             onStart: (players: Map<string, PlayerStats>) => {
+    //                 setViewState((prevViewState : GameState) => ({...prevViewState, playerStatsMap: players}));
+    //             },
+    //             onDisconnect: () => {
+    //                 setTimeout(() => {
+    //                     viewHandler.home?.();
+    //                 }, 3000);
+    //                 setViewState({...viewState, page: WordfinderPage.DisconnectedView});
+    //             }
+    //         };
 
-            const wordfinder : Wordfinder = await new WordfinderBuilder()
-                .withStateHandlers(handlers)
-                .withWebsocketServer(websocketURL)
-                .build();
-            startHandler.current = wordfinder.getRequestToStartCallback();
-            setViewState({...viewState, gameID: wordfinder.getID()});
-        };
+    //         const wordfinder : Wordfinder = await new WordfinderBuilder()
+    //             .withStateHandlers(handlers)
+    //             .withWebsocketServer(websocketURL)
+    //             .build();
+    //         startHandler.current = wordfinder.getRequestToStartCallback();
+    //         setViewState({...viewState, gameID: wordfinder.getID()});
+    //     };
 
-        gameSetup();
-    }, []);
+    //     gameSetup();
+    // }, []);
 
 
-    switch(viewState.page) {
-        case WordfinderPage.InitialView:
-            return <InitialView gameID={viewState.gameID} players={viewState.players} error={viewState.error} startHandler={startHandler.current}/>;
-        case WordfinderPage.WaitingView:
-            return <WaitingView player={viewState.currentPlayer} playerStatsMap={viewState.playerStatsMap}/>
-        case WordfinderPage.WordAndPromptSubmittedView:
-            return <WordAndPromptSubmittedView player={viewState.currentPlayer} playerStats={viewState.playerStatsMap}/>
-        case WordfinderPage.AnsweredView:
-            return <AnsweredView ranking={viewState.ranking} answerMap={viewState.answerMap} correctAnswer={viewState.correctAnswer} />;
-        case WordfinderPage.EndedView:
-            return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>
-        case WordfinderPage.DisconnectedView:
-            return <DisconnectedView />;
-            ;
-    }
+    // switch(viewState.page) {
+    //     case WordfinderPage.InitialView:
+    //         return <InitialView gameID={viewState.gameID} players={viewState.players} error={viewState.error} startHandler={startHandler.current}/>;
+    //     case WordfinderPage.WaitingView:
+    //         return <WaitingView player={viewState.currentPlayer} playerStatsMap={viewState.playerStatsMap}/>
+    //     case WordfinderPage.WordAndPromptSubmittedView:
+    //         return <WordAndPromptSubmittedView player={viewState.currentPlayer} playerStats={viewState.playerStatsMap}/>
+    //     case WordfinderPage.AnsweredView:
+    //         return <AnsweredView ranking={viewState.ranking} answerMap={viewState.answerMap} correctAnswer={viewState.correctAnswer} />;
+    //     case WordfinderPage.EndedView:
+    //         return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>
+    //     case WordfinderPage.DisconnectedView:
+    //         return <DisconnectedView />;
+    // }
+
+    const mockRanking = [
+        ['tarcan', {points: 60}],
+        ['melo', {points: 50}],
+        ['pubo', {points: 30}]
+    ]
+
+    return <EndedView ranking={mockRanking} viewHandler={viewHandler}/>
 }
 
 const InitialView = ( {gameID, players, error, startHandler} : any ) => {
@@ -242,17 +250,34 @@ const AnsweredView = ( {ranking, answerMap, correctAnswer, playerStatsMap} : any
 
 const EndedView = ( {ranking, viewHandler} : any ) => {
 
+    const float = keyframes`
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0); }
+        `;
+
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
-        <Center w='inherit' h='inherit' paddingTop='10vh'>
-                <VStack w='inherit' h='inherit'>
+        <Center>
+                <VStack w='inherit' h='100vh' paddingTop='5vh'>
                 <TransitionForEach>
-                    {ranking.map((playerEntry: [string, any], i : number) => {
-                        return <Box key={i}>
-                            <Heading as='h2' color='whitesmoke'> {i+1}. {playerEntry[0]} </Heading>
-                            <Heading as='h3' color='whitesmoke'> Points: {playerEntry[1].points} </Heading>
-                        </Box>
-                    })}
-                    <Heading as='h2' color='whitesmoke'> Congratulations! </Heading>
+                    <Box h="40vh">
+                        {ranking.map((playerEntry: [string, PlayerStats], i : number) => {
+                            const player = playerEntry[0];
+                            const stats = playerEntry[1];
+                            return <VStack width='90%' gap={2} height={'10vh'} key={i}>
+                                <HStack>
+                                    <Center bgColor={PALETTE.primary} color='whitesmoke' height='4rem' width='20ch'>
+                                        <Text>{player}</Text>
+                                    </Center>
+                                    <Square border={1} borderColor={PALETTE.primary} color='whitesmoke' size='4rem'>
+                                        <Text>{stats?.points}</Text>
+                                    </Square>
+                                </HStack>
+                        </VStack>    
+                        })}
+                    </Box>
+
+                    <Heading as='h2' color='whitesmoke' h='20vh' animation={`${float} infinite 3s ease-in-out`}> Congratulations! </Heading>
                     <Button w='30vw' bgColor={PALETTE.quartery} boxShadow='5px 5px 3px' onClick={viewHandler.home}> Back To Menu </Button>
                 </TransitionForEach>
                 </VStack>
