@@ -287,11 +287,6 @@ export class Wordfinder {
         return this.wordBank[randomNum];
     }
 
-    // min and max are integers
-    private getRandomInt(min: number, max: number) {
-
-    }
-
     private playerExists(player: string) : Boolean {
         return this.players?.has(player);
     }
