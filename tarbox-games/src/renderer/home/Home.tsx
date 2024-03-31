@@ -3,6 +3,7 @@ import { Button, Flex, Center, VStack, Heading, Container, Text, Alert, AlertIco
 import { PALETTE, TEXT } from "../../constants";
 import { appBackgroundGradient } from "../theme";
 import AppContext from "../AppContext";
+import TransitionForEach from "../components/TransitionForEach";
 
 const Home = () => {
     const showMessage = useToast();
@@ -12,6 +13,7 @@ const Home = () => {
     const viewHandler = context.viewHandlerProvider.get();
 
     return <Flex direction='column' h='100vh' w='100vw' bgGradient={appBackgroundGradient} color={TEXT.primary} paddingTop='10vh'> 
+    <TransitionForEach delay={0.1}>
         <Center w='100vw' gap='10vh' h='10vh'>
             <Heading as='h2' size='3xl'  border='1px' borderRadius='10px' fontFamily='logo' padding='30px'> Tarbox Games </Heading>
         </Center>
@@ -39,6 +41,7 @@ const Home = () => {
                 }}>Mover</Button>
             </VStack>
         </Center>
+    </TransitionForEach>
     </Flex>
 };
 
