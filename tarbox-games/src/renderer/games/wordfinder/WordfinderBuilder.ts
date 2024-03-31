@@ -5,7 +5,7 @@ import { Wordfinder } from "./Wordfinder";
 
 export class WordfinderBuilder {
     private gameInstance: Wordfinder | undefined;
-    private numOfRounds: number = 3;
+    private numOfRounds: number | undefined;
 
     private listeners: TarboxStateHandlers | undefined = undefined;
     private wsBrokerUrl: URL | undefined = undefined;
@@ -60,6 +60,14 @@ export class WordfinderBuilder {
         const wordBank = await this.loadBank('basic');
 
         this.gameInstance.loadWordBank(wordBank);
+
+        // @ts-ignore
+        globalThis.electron.tarboxRemoteProcedures.onQuit(async (event) => {
+            await this.gameInstance!.endGame();
+
+            // @ts-ignore
+            globalThis.electron.tarboxRemoteProcedures.cleanupComplete();
+        });
 
         return this.gameInstance;
     }

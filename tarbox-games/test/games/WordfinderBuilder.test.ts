@@ -39,7 +39,9 @@ describe('Wordfinder Builder Tests', () => {
     beforeAll(() => {
         globalThis.electron = {
             tarboxRemoteProcedures: {
-                loadWordBank: () => ['word', 'bank']
+                loadWordBank: () => ['word', 'bank'],
+                onQuit: () => {},
+                cleanupComplete: () => {}
             }
         }
     });

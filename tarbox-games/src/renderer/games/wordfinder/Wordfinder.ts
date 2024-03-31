@@ -133,6 +133,12 @@ export class Wordfinder {
             }
         }
 
+        wsClient.onWebSocketClose = (event: CloseEvent) => {
+            if(!this.hasEnded) {
+                this.endGame();
+            }
+        }
+
         wsClient.onWebSocketError = (error : string) => {
             this.onError?.(error);
         };
@@ -383,7 +389,7 @@ export class Wordfinder {
     }
 
     public async endGame() : Promise<void> {
-        const res = await fetch(`${this.getBaseURL()}/api/games/${this.gameID}`, {
+        const res = await fetch(this.resolvePath(`/api/games/${this.gameID}`), {
             method: 'PUT',
             body: JSON.stringify({
                 operation: "END"
@@ -410,5 +416,9 @@ export class Wordfinder {
                 throw new Error(`${prop} is not provided from the client.`);
             }
         }
+    }
+
+    private resolvePath(path: string) : URL {
+        return new URL(path, this.getBaseURL());
     }
 }

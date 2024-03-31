@@ -16,13 +16,24 @@ const createWindow = () => {
     });
 
     window.loadFile(MAIN_PAGE);
+
+    window.on('close', (e) => {
+        e.preventDefault();
+        window.webContents.send('quit');
+    });
+
+    ipcMain.handle('load-word-bank', async (event, ...args) => {
+        const result = await readFile(path.join(__dirname, 'data/wordfinder', 'basic_word_bank.json'));
+        return JSON.parse(result.toString());
+    })
+    
+    ipcMain.handleOnce('cleanup-complete', () => {
+        console.log("Cleanup done!");
+        window.destroy();
+        app.quit();
+    })
 }
 
 app.whenReady().then(() => {
     createWindow();
 });
-
-ipcMain.handle('load-word-bank', async (event, ...args) => {
-    const result = await readFile(path.join(__dirname, 'data/wordfinder', 'basic_word_bank.json'));
-    return JSON.parse(result.toString());
-})
