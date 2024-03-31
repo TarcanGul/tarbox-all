@@ -9,6 +9,8 @@ const URL_ERROR = "Base URL is not set.";
 const GAME_INIT_ERROR = "Game ID is not initialized while creating the WS client.";
 
 export class Wordfinder {
+    private hasEnded = false;
+
     private wsClient: Client | undefined;
     private currentAnswer: string;
     private currentPickedIndex = 0;
@@ -22,7 +24,7 @@ export class Wordfinder {
     private wordBank: string[] = [];
     private playerList : string[] = [];
 
-    private DEFAULT_NUM_OF_ROUNDS = 3;
+    private DEFAULT_NUM_OF_ROUNDS = 1;
 
     // Callbacks
     private onError : (message : string) => void = () => undefined;
@@ -126,7 +128,9 @@ export class Wordfinder {
         };
 
         wsClient.onDisconnect = (frame: any) => {
-            this.onDisconnect?.();
+            if(!this.hasEnded) {
+                this.onDisconnect?.();
+            }
         }
 
         wsClient.onWebSocketError = (error : string) => {
@@ -249,9 +253,7 @@ export class Wordfinder {
                     ranking: this.getRankingForRound()
                 });
 
-                // Disconnect everyone. End the game.
                 this.endGame();
-
                 return;
             }
             else {
@@ -380,7 +382,7 @@ export class Wordfinder {
         return ranking;
     }
 
-    private async endGame() : Promise<void> {
+    public async endGame() : Promise<void> {
         const res = await fetch(`${this.getBaseURL()}/api/games/${this.gameID}`, {
             method: 'PUT',
             body: JSON.stringify({
@@ -398,6 +400,7 @@ export class Wordfinder {
         }
 
         this.publishMessageToPlayers(gameEndedMessage);
+        this.hasEnded = true;
         await this.wsClient!.deactivate();
     }
 

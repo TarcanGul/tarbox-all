@@ -1,8 +1,8 @@
 import React, { ReactElement, useContext, useEffect, useRef, useState } from "react";
 import { WordfinderBuilder } from "../games/wordfinder/WordfinderBuilder";
 import { PlayerStats, TarboxViewHandler } from "../../types";
-import { Text, Spinner, List, ListItem, Heading, Box, Button, useToast, Container, VStack, Center, HStack, Flex, Tooltip, Square, Spacer, ScaleFade, useDisclosure, useTimeout } from '@chakra-ui/react';
-import { PALETTE } from "../../constants";
+import { Text, Spinner, List, ListItem, Heading, Box, Button, useToast, Container, VStack, Center, HStack, Flex, Tooltip, Square, Spacer, ScaleFade, useDisclosure, useTimeout, Fade, Slide, SlideFade } from '@chakra-ui/react';
+import { DEFAULT_TRANSITION, PALETTE } from "../../constants";
 import { appBackgroundGradient } from "../theme";
 import { Wordfinder } from "../games/wordfinder/Wordfinder";
 import AppContext from "../AppContext";
@@ -92,74 +92,61 @@ const WordfinderView = () => {
     const viewHandler = context.viewHandlerProvider.get();
     const websocketURL = context.tarboxWebsocketURL;
 
-    // useEffect(() => {
-    //     const gameSetup = async () => {
-    //         const handlers = {
-    //             onError: (message : string) => setViewState({...viewState, error: message}),
-    //             onPlayerAdd: (player: string) => setViewState((prevViewState : GameState) => ({...prevViewState, players: [...prevViewState.players, player]})),
-    //             onDone: (player: string, playerStatsMap: Map<string, PlayerStats>) => {
-    //                 setViewState({...viewState, currentPlayer: player, playerStatsMap: playerStatsMap, page: WordfinderPage.WordAndPromptSubmittedView });
-    //             },
-    //             onAnswer: (answerBody: any) => {
-    //                 setViewState({...viewState, answerMap: answerBody.answers, correctAnswer: answerBody.correctAnswer, ranking: answerBody.ranking, page: WordfinderPage.AnsweredView});
-    //             },
-    //             onEnd: (endBody: any) => {
-    //                 setViewState({...viewState, ranking: endBody.ranking, page: WordfinderPage.EndedView});
-    //             },
-    //             onBeginNextRound: (picker:  string, playerStatsMap: Map<string, PlayerStats>) => {
-    //                 setViewState({...viewState, currentPlayer: picker, page: WordfinderPage.WaitingView, playerStatsMap: playerStatsMap});
-    //             },
-    //             onStart: (players: Map<string, PlayerStats>) => {
-    //                 setViewState((prevViewState : GameState) => ({...prevViewState, playerStatsMap: players}));
-    //             },
-    //             onDisconnect: () => {
-    //                 setTimeout(() => {
-    //                     viewHandler.home?.();
-    //                 }, 3000);
-    //                 setViewState({...viewState, page: WordfinderPage.DisconnectedView});
-    //             }
-    //         };
+    useEffect(() => {
+        const gameSetup = async () => {
+            const handlers = {
+                onError: (message : string) => setViewState({...viewState, error: message}),
+                onPlayerAdd: (player: string) => setViewState((prevViewState : GameState) => ({...prevViewState, players: [...prevViewState.players, player]})),
+                onDone: (player: string, playerStatsMap: Map<string, PlayerStats>) => {
+                    setViewState({...viewState, currentPlayer: player, playerStatsMap: playerStatsMap, page: WordfinderPage.WordAndPromptSubmittedView });
+                },
+                onAnswer: (answerBody: any) => {
+                    setViewState({...viewState, answerMap: answerBody.answers, correctAnswer: answerBody.correctAnswer, ranking: answerBody.ranking, page: WordfinderPage.AnsweredView});
+                },
+                onEnd: (endBody: any) => {
+                    setViewState({...viewState, ranking: endBody.ranking, page: WordfinderPage.EndedView});
+                },
+                onBeginNextRound: (picker:  string, playerStatsMap: Map<string, PlayerStats>) => {
+                    setViewState({...viewState, currentPlayer: picker, page: WordfinderPage.WaitingView, playerStatsMap: playerStatsMap});
+                },
+                onStart: (players: Map<string, PlayerStats>) => {
+                    setViewState((prevViewState : GameState) => ({...prevViewState, playerStatsMap: players}));
+                },
+                onDisconnect: () => {
+                    setTimeout(() => {
+                        viewHandler.home?.();
+                    }, 3000);
+                    setViewState({...viewState, page: WordfinderPage.DisconnectedView});
+                }
+            };
 
-    //         const wordfinder : Wordfinder = await new WordfinderBuilder()
-    //             .withStateHandlers(handlers)
-    //             .withWebsocketServer(websocketURL)
-    //             .build();
-    //         startHandler.current = wordfinder.getRequestToStartCallback();
-    //         setViewState({...viewState, gameID: wordfinder.getID()});
-    //     };
+            const wordfinder : Wordfinder = await new WordfinderBuilder()
+                .withStateHandlers(handlers)
+                .withWebsocketServer(websocketURL)
+                .build();
+            startHandler.current = wordfinder.getRequestToStartCallback();
+            setViewState({...viewState, gameID: wordfinder.getID()});
+        };
 
-    //     gameSetup();
-    // }, []);
+        gameSetup();
+    }, []);
 
 
-    // switch(viewState.page) {
-    //     case WordfinderPage.InitialView:
-    //         return <InitialView gameID={viewState.gameID} players={viewState.players} error={viewState.error} startHandler={startHandler.current}/>;
-    //     case WordfinderPage.WaitingView:
-    //         return <WaitingView player={viewState.currentPlayer} playerStatsMap={viewState.playerStatsMap}/>
-    //     case WordfinderPage.WordAndPromptSubmittedView:
-    //         return <WordAndPromptSubmittedView player={viewState.currentPlayer} playerStats={viewState.playerStatsMap}/>
-    //     case WordfinderPage.AnsweredView:
-    //         return <AnsweredView ranking={viewState.ranking} answerMap={viewState.answerMap} correctAnswer={viewState.correctAnswer} />;
-    //     case WordfinderPage.EndedView:
-    //         return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>
-    //     case WordfinderPage.DisconnectedView:
-    //         return <DisconnectedView />;
-    //         ;
-    // }
-
-    const mockMap = new Map();
-    mockMap.set('tarcan', 'answer');
-    mockMap.set('poa', 'myanswer');
-    mockMap.set('perko', 'answerr');
-
-    const mockRanking = [
-        ['tarcan', { points: 50 }],
-        ['poa', { points: 20 }],
-        ['perko', { points: 0 }]
-    ]
-
-    return <AnsweredView ranking={mockRanking} answerMap={mockMap} correctAnswer={'answer'} />;
+    switch(viewState.page) {
+        case WordfinderPage.InitialView:
+            return <InitialView gameID={viewState.gameID} players={viewState.players} error={viewState.error} startHandler={startHandler.current}/>;
+        case WordfinderPage.WaitingView:
+            return <WaitingView player={viewState.currentPlayer} playerStatsMap={viewState.playerStatsMap}/>
+        case WordfinderPage.WordAndPromptSubmittedView:
+            return <WordAndPromptSubmittedView player={viewState.currentPlayer} playerStats={viewState.playerStatsMap}/>
+        case WordfinderPage.AnsweredView:
+            return <AnsweredView ranking={viewState.ranking} answerMap={viewState.answerMap} correctAnswer={viewState.correctAnswer} />;
+        case WordfinderPage.EndedView:
+            return <EndedView ranking={viewState.ranking} viewHandler={viewHandler}/>
+        case WordfinderPage.DisconnectedView:
+            return <DisconnectedView />;
+            ;
+    }
 }
 
 const InitialView = ( {gameID, players, error, startHandler} : any ) => {
@@ -169,30 +156,32 @@ const InitialView = ( {gameID, players, error, startHandler} : any ) => {
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
         <Center w='inherit' h='inherit'>
             <VStack gap='5vh' color='whitesmoke' paddingTop='10vh' w='inherit' h='inherit'>
-                {error ? <Error error={error}></Error> : <></>}
-                <Heading size='2xl' fontWeight='800' fontStyle='italic'> Wordfinder </Heading>
-                <Heading size='xl'> Welcome! </Heading>
-                <Flex gap='2vw' alignContent='center' alignItems='center'>
-                    <Text fontSize='2xl'> Game code: </Text>
-                    <Box borderRadius='20px' border='ButtonText' bgColor={PALETTE.quartery} padding='10px'>
-                        <Center>
-                            {gameID ? <Text fontSize='2.5rem'> {gameID} </Text> : <Spinner color={PALETTE.primary}/>}
-                        </Center>
-                    </Box>    
-                </Flex>
-                <PlayerList players={players}></PlayerList>
-                <VStack h='20vh' w='50vw' align='center' justifyContent='center' gap={'5vh'}>
-                    <Tooltip label='You need at least 3 players.' isDisabled={canStart} hasArrow>
-                        <Button 
-                            w='30vw' 
-                            bgColor={PALETTE.quartery} 
-                            boxShadow='5px 5px 3px' 
-                            isDisabled={!canStart} 
-                            onClick={startHandler}>
-                            Start
-                        </Button>
-                    </Tooltip>
-                </VStack>
+            <TransitionForEach delay={0.1}>
+                    {error ? <Error error={error}></Error> : <></>}
+                    <Heading size='2xl' fontWeight='800' fontStyle='italic'> Wordfinder </Heading>
+                    <Heading size='xl'> Welcome! </Heading>
+                    <Flex gap='2vw' alignContent='center' alignItems='center'>
+                        <Text fontSize='2xl'> Game code: </Text>
+                        <Box borderRadius='20px' border='ButtonText' bgColor={PALETTE.quartery} padding='10px'>
+                            <Center>
+                                {gameID ? <Text fontSize='2.5rem'> {gameID} </Text> : <Spinner color={PALETTE.primary}/>}
+                            </Center>
+                        </Box>    
+                    </Flex>
+                    <PlayerList players={players}></PlayerList>
+                    <VStack h='20vh' w='50vw' align='center' justifyContent='center' gap={'5vh'}>
+                        <Tooltip label='You need at least 3 players.' isDisabled={canStart} hasArrow>
+                            <Button 
+                                w='30vw' 
+                                bgColor={PALETTE.quartery} 
+                                boxShadow='5px 5px 3px' 
+                                isDisabled={!canStart} 
+                                onClick={startHandler}>
+                                Start
+                            </Button>
+                        </Tooltip>
+                    </VStack>
+                </TransitionForEach>
             </VStack>
         </Center>
     </Box>
@@ -200,99 +189,87 @@ const InitialView = ( {gameID, players, error, startHandler} : any ) => {
 
 const WordAndPromptSubmittedView = ( { player, playerStats } : { player: string, playerStats: Map<string, PlayerStats> } ) => {
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body' justifyContent='center' alignItems='center'>
-        <Center w='inherit' h='80%'>
-            <Heading as='h1' fontFamily='body' color='whitesmoke' >{player} has picked the word.</Heading>
-        </Center>
-        <Flex h='20%' justifyContent='center' alignItems='center'>
-            <PointBar players={playerStats}></PointBar>
-        </Flex>
+        <TransitionForEach>
+            <Center w='inherit' h='80vh'>
+                <Heading as='h1' fontFamily='body' color='whitesmoke' >{player} has picked the prompt!</Heading>
+            </Center>
+            <Flex h='20vh' justifyContent='center' alignItems='center'>
+                <PointBar players={playerStats}></PointBar>
+            </Flex>
+        </TransitionForEach>
     </Box>
 }
 
 const AnsweredView = ( {ranking, answerMap, correctAnswer, playerStatsMap} : any ) => {
 
-    const { isOpen: isFirst, onToggle: toggleFirst } = useDisclosure();
-    const { isOpen: isSecond, onOpen: openSecond } = useDisclosure();
-    const { isOpen: isThird, onOpen: openThird } = useDisclosure();
-    const { isOpen: isFourth, onOpen: openFourth } = useDisclosure();
-    const { isOpen: isFifth, onOpen: openFifth } = useDisclosure();
-
     const answers : any = [];
-    answerMap.forEach((answer : string, player: string) => answers.push(<Heading as='h2' key={player}> {player} answered {answer} </Heading>));
-
-    const TRANSITION_GAP = 200;
-
-    // I am using setTimeout as a workaround.
-    // open issue at https://github.com/chakra-ui/chakra-ui/issues for on transtion end, example code is ready, put to codesandbox once it starts working.
-    useEffect(() => {
-        toggleFirst();
-        setTimeout(() => {
-            openSecond();
-        }, TRANSITION_GAP);
-        setTimeout(() => {
-            openThird();
-        }, TRANSITION_GAP * 2);
-        setTimeout(() => {
-            openFourth();
-        }, TRANSITION_GAP * 3);
-        setTimeout(() => {
-            openFifth();
-        }, TRANSITION_GAP * 4);
-    }, [])
+    answerMap.forEach((answer : string, player: string) => 
+        answers.push(
+            <Heading as='h2' key={player} color="whitesmoke"> 
+                <BoxedWord color={PALETTE.primary}>{player}</BoxedWord> answered <u>{answer}</u> 
+            </Heading>));
 
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
-        <Center w='inherit' h='80%'>
-            <VStack w='inherit' h='inherit'>
-                <ScaleFade key={1} initialScale={0.5} in={isFirst} transition={{enter: {duration: 1, ease: 'easeOut'}}}>
+        <Center>
+            <VStack w='inherit' h='100%' gap={10} spacing={2} paddingTop={'5vh'}>
+                <TransitionForEach> 
                     <Heading as='h1' color='whitesmoke'>Everyone answered!</Heading>
-                </ScaleFade>
-                <ScaleFade key={2} initialScale={0.5} in={isSecond} transition={{enter: {duration: 1, ease: 'easeOut'}}}>
-                    { answers }
-                </ScaleFade>
-                <ScaleFade key={3} initialScale={0.5} in={isThird} transition={{enter: {duration: 1, ease: 'easeOut'}}}>
-                    <Heading as='h1' color='whitesmoke'>Correct answer is {correctAnswer}.</Heading>
-                </ScaleFade>
-                <ScaleFade key={4} initialScale={0.5} in={isFourth} transition={{enter: {duration: 1, ease: 'easeOut'}}}>
-                    {ranking.map((playerEntry: [string, any], i : number) => {
-                                return <Box key={i}>
-                                    <Heading as='h2' color='whitesmoke'> {i+1}. {playerEntry[0]} </Heading>
-                                    <Heading as='h3' color='whitesmoke'> Points: {playerEntry[1].points} </Heading>
-                                </Box>
+                    <VStack gap={5} bgColor={PALETTE.box} padding={'1rem'} borderRadius={'1rem'}>
+                        { answers }
+                    </VStack>
+                    <Heading as='h1' color='whitesmoke'>Correct answer is <BoxedWord color={"green"}>{correctAnswer}</BoxedWord></Heading>
+
+                    {ranking.map((playerEntry: [string, PlayerStats], i : number) => {
+                        const player = playerEntry[0];
+                        const stats = playerEntry[1];
+                        return <VStack width='90%' gap={2} height={'10vh'} key={i}>
+                            <HStack>
+                                <Center bgColor={PALETTE.primary} color='whitesmoke' height='4rem' width='20ch'>
+                                    <Text>{player}</Text>
+                                </Center>
+                                <Square border={1} borderColor={PALETTE.primary} color='whitesmoke' size='4rem'>
+                                    <Text>{stats?.points}</Text>
+                                </Square>
+                            </HStack>
+                    </VStack>    
                     })}
-                </ScaleFade>
-                <ScaleFade key={5} initialScale={0.5} in={isFifth} transition={{enter: {duration: 1, ease: 'easeOut'}}}>
                     <Heading as='h3' color='whitesmoke'>Next round is starting soon...</Heading>
-                </ScaleFade>
+                </TransitionForEach>
             </VStack>
         </Center>
     </Box>
 }
 
 const EndedView = ( {ranking, viewHandler} : any ) => {
+
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
         <Center w='inherit' h='inherit' paddingTop='10vh'>
-            <VStack w='inherit' h='inherit'>
-                {ranking.map((playerEntry: [string, any], i : number) => {
-                    return <Box key={i}>
-                        <Heading as='h2' color='whitesmoke'> {i+1}. {playerEntry[0]} </Heading>
-                        <Heading as='h3' color='whitesmoke'> Points: {playerEntry[1].points} </Heading>
-                    </Box>
-                })}
-                <Heading as='h2' color='whitesmoke'> Congratulations! </Heading>
-                <Button w='30vw' bgColor={PALETTE.quartery} boxShadow='5px 5px 3px' onClick={viewHandler.home}> Back To Menu </Button>
-            </VStack>
+                <VStack w='inherit' h='inherit'>
+                <TransitionForEach>
+                    {ranking.map((playerEntry: [string, any], i : number) => {
+                        return <Box key={i}>
+                            <Heading as='h2' color='whitesmoke'> {i+1}. {playerEntry[0]} </Heading>
+                            <Heading as='h3' color='whitesmoke'> Points: {playerEntry[1].points} </Heading>
+                        </Box>
+                    })}
+                    <Heading as='h2' color='whitesmoke'> Congratulations! </Heading>
+                    <Button w='30vw' bgColor={PALETTE.quartery} boxShadow='5px 5px 3px' onClick={viewHandler.home}> Back To Menu </Button>
+                </TransitionForEach>
+                </VStack>
         </Center>
     </Box>
 }
 
 const WaitingView = ( {player, playerStatsMap} : any ) => {
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
-        <Center w='inherit' h='80%'>
-            <Heading as='h1' color='whitesmoke'>Waiting for {player} to pick a word...</Heading>
-        </Center>
-        <Flex h='20%' justifyContent='center' alignItems='center'>
-            <PointBar players={playerStatsMap}></PointBar>
-        </Flex>
+        <TransitionForEach>
+            <Center w='inherit' h='80vh'>
+                    <Heading as='h1' color='whitesmoke'>Waiting for {player} to pick a prompt...</Heading>
+                </Center>
+                <Flex h='20vh' justifyContent='center' alignItems='center'>
+                    <PointBar players={playerStatsMap}></PointBar>
+                </Flex>
+        </TransitionForEach>
     </Box> 
 }
 
@@ -358,16 +335,19 @@ const Timeout = ( {children, time} : any ) => {
     return <Box>{children}</Box>;
 }
 
-const TransitionForEach = ( {children} : any) => {
-    const count = React.Children.count(children);
-    const TRANSITION_GAP = 200;
+const TransitionForEach = ( {children, delay = DEFAULT_TRANSITION.DELAY} : {children: ReactElement[], delay?: number}) => {
+    
     return <>
-        {React.Children.map(children, (child, i) => {
-            <ScaleFade key={1} initialScale={0.5} in={true} transition={{enter: {duration: 1, ease: 'easeOut', delay: TRANSITION_GAP * i}}}>
+        {children.map((child: any, i: number) => {
+            return <SlideFade key={i} in={true} transition={{enter: {duration: 1, ease: 'easeOut', delay: delay * i}}}>
                 {child}
-            </ScaleFade>
+            </SlideFade>
         })}
     </>
+}
+
+const BoxedWord = ( {children, color} : any ) => {
+    return <Box borderRadius="1rem" padding={'0.3rem'} bgColor={color} color={"whitesmoke"} display={"inline"}>{children}</Box>
 }
 
 export default WordfinderView;
