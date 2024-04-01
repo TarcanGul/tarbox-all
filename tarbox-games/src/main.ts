@@ -23,7 +23,12 @@ const createWindow = () => {
     });
 
     ipcMain.handle('load-word-bank', async (event, ...args) => {
-        const result = await readFile(path.join(__dirname, 'data/wordfinder', 'basic_word_bank.json'));
+        console.log("given args...");
+        if(args.length === 0) {
+            return;
+        }
+        const wordBankType = args[0];
+        const result = await readFile(path.join(__dirname, 'data/wordfinder', wordBankType + '_word_bank.json'));
         return JSON.parse(result.toString());
     })
     

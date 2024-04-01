@@ -1,6 +1,5 @@
 package tarcan.projects.tarbox.controllers;
 
-import org.hibernate.engine.jdbc.env.internal.LobCreationLogging_.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
-import jakarta.servlet.http.HttpServletRequest;
 import tarcan.projects.tarbox.models.Game;
 import tarcan.projects.tarbox.repositories.GameRepository;
 

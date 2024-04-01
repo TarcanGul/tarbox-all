@@ -36,7 +36,7 @@ export class WordfinderBuilder {
 
     private async loadBank(type: string) : Promise<string[]> {
         // @ts-ignore
-        const resultBank : string[] = await globalThis.electron.tarboxRemoteProcedures.loadWordBank(type); // Returns list of words.
+        const resultBank : string[] = await globalThis.electron.tarboxRemoteProcedures.loadWordBank(type);
         return resultBank;
     }
 
