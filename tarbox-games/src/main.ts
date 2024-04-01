@@ -23,7 +23,6 @@ const createWindow = () => {
     });
 
     ipcMain.handle('load-word-bank', async (event, ...args) => {
-        console.log("given args...");
         if(args.length === 0) {
             return;
         }
