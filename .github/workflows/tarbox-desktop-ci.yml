@@ -36,8 +36,6 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
-        cache-dependency-path: 'tarbox-games/pnpm-lock.yaml'
     - run: pnpm install
     - run: pnpm clean && pnpm build
     - run: pnpm test

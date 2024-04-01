@@ -7,7 +7,8 @@ describe('Wordfinder Tests', () => {
 
     const TEST_URL = "http://mockurltest.com";
     const MOCK_GAME_ID = '1111';
-    const TEST_WS = new URL("http://testwebsock.com")
+    const TEST_WS = new URL("http://testwebsock.com");
+    const MOCK_SECRET_CODE = "SECRET_CODE";
     let originalFetch;
 
     const mockReceivedMessageQueue : IPublishParams[] = [];
@@ -66,11 +67,8 @@ describe('Wordfinder Tests', () => {
     it('Create Game Successful', async () => {
         const w = createWordfinderInstance();
         w.loadWordBank(mockWordBank);
-        jest.spyOn(w, 'setID');
         w.setBaseURL(new URL(TEST_URL));
-        const id = await w.createGame();
-        expect(id).toEqual(MOCK_GAME_ID);
-        expect(w.setID).toHaveBeenCalledTimes(1);
+        await w.createGame();
         expect(w.getID()).toEqual(MOCK_GAME_ID);
     })
 
@@ -145,16 +143,11 @@ describe('Wordfinder Tests', () => {
         const startCallback = w.getRequestToStartCallback();
         startCallback();
 
-        const addPlayerBody = {
-            status: 'P_ADDED',
-            player: 'player1'
-        }
-
         const mockPlayerClient = new Client({
             brokerURL: TEST_WS.toString()
         });
 
-        mockPlayerClient.publish({destination: `/game/${MOCK_GAME_ID}/events/server`, body: JSON.stringify(addPlayerBody) });
+        mockPlayerClient.publish({destination: `/game/${MOCK_GAME_ID}/events/server`, body:  mockAddPlayerMessage('player1') });
         expect(mockListeners.onPlayerAdd).toHaveBeenCalledWith('player1');
     })
 
@@ -176,7 +169,8 @@ describe('Wordfinder Tests', () => {
 
         const messageBody = {
             status: 'ERROR',
-            message: 'What is life without error?'
+            message: 'What is life without error?',
+            secretCode: MOCK_SECRET_CODE
         }
 
         const mockPlayerClient = new Client({
@@ -438,17 +432,21 @@ describe('Wordfinder Tests', () => {
 
     const mockAddPlayerMessage = (player: string) => JSON.stringify({
         status: 'P_ADDED',
-        player: player
+        player: player,
+        secretCode: MOCK_SECRET_CODE
     })
 
     const mockPlayerAnswerMessage = (player: string, answer: string) => JSON.stringify({
         status: 'ANSWER',
         word: answer,
-        player: player
+        player: player,
+        secretCode: MOCK_SECRET_CODE
+
     })
 
     const mockStartGameMessage = () => JSON.stringify({
-        status: 'STARTED'
+        status: 'STARTED',
+        secretCode: MOCK_SECRET_CODE
     })
 
     const mockWordAndPromptSelectedMessage = (player: string, answer: string, prompt: string) => JSON.stringify({
@@ -456,7 +454,8 @@ describe('Wordfinder Tests', () => {
         gameId: MOCK_GAME_ID,
         player: player,
         word: answer,
-        prompt: prompt
+        prompt: prompt,
+        secretCode: MOCK_SECRET_CODE
     });
 
     function setupMocks() {
@@ -511,7 +510,8 @@ describe('Wordfinder Tests', () => {
                             status: 201,
                             json: () => {
                             return {
-                                id : MOCK_GAME_ID
+                                id : MOCK_GAME_ID,
+                                secretCode: MOCK_SECRET_CODE
                             }   
                         }};
                     }

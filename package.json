@@ -2,10 +2,10 @@
     "name": "tarbox-root",
     "version": "1.0.0",
     "scripts": {
-      "install:tarbox-games": "pnpm install --prefix ./tarbox-games",
-      "build:tarbox-games": "pnpm run build --prefix ./tarbox-games",
-      "test:tarbox-games": "pnpm test --prefix ./tarbox-games",
-      "clean:tarbox-games": "pnpm test --prefix ./tarbox-games"
+      "install": "pnpm install --prefix ./tarbox-games",
+      "build": "pnpm run build --prefix ./tarbox-games",
+      "test": "pnpm test --prefix ./tarbox-games",
+      "clean": "pnpm test --prefix ./tarbox-games"
     },
     "private": true
   }
