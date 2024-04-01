@@ -30,6 +30,8 @@ jobs:
         fetch-depth: 0
         sparse-checkout: 'tarbox-games/'
     - uses: pnpm/action-setup@v3
+      with:
+        version: 8.5.1
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
