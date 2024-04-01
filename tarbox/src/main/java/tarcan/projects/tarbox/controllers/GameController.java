@@ -9,9 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,17 +18,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.github.resilience4j.core.lang.NonNull;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
 import tarcan.projects.tarbox.components.SecretCodeGenerator;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
-import tarcan.projects.tarbox.messages.GameEventMessage;
 import tarcan.projects.tarbox.models.Game;
 import tarcan.projects.tarbox.repositories.GameRepository;
 import tarcan.projects.tarbox.utilities.MaxPlayersReachedException;
-import tarcan.projects.tarbox.utilities.MessageDestination;
 import tarcan.projects.tarbox.utilities.PlayerNameAlreadyExistsException;
 
 @RestController
@@ -42,9 +37,6 @@ public class GameController {
 
     @Autowired
     GameRepository gameRepository;
-
-    @Autowired
-    private SimpMessagingTemplate messageSender;
 
     @Autowired
     private SecretCodeGenerator codeGenerator;
@@ -162,7 +154,6 @@ public class GameController {
 
     @PutMapping("/games/{gameId}")
     public ResponseEntity<String> updateGame(@PathVariable Long gameId, @RequestBody String body, HttpServletRequest request) {
-        logger.info("Updating game status for game " + gameId);
         JSONObject result = new JSONObject();
         if(gameId == null) {
             result.put("error", "No game was sent.");
@@ -216,12 +207,5 @@ public class GameController {
         JSONObject badRequesObject = new JSONObject();
         badRequesObject.put("error", message);
         return ResponseEntity.badRequest().body(badRequesObject.toString());
-    }
-
-    private void sendMessageToPlayers(Long gameId, GameState status) {
-        GameEventMessage gameMessage = new GameEventMessage();
-        gameMessage.setGameId(String.valueOf(gameId));
-        gameMessage.setStatus(status);
-        messageSender.convertAndSend(MessageDestination.toPlayers(gameId), gameMessage);
     }
 }

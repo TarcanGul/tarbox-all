@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import tarcan.projects.tarbox.components.SecretCodeGenerator;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
 import tarcan.projects.tarbox.models.Game;
@@ -40,6 +41,8 @@ public class GameControllerTest {
     @Mock
     Game mockGame;
 
+    @MockBean
+    SecretCodeGenerator codeGenerator;
 
     @Autowired
     private MockMvc mockMvc;
