@@ -29,13 +29,12 @@ jobs:
         # Fetch all history for all tags and branches
         fetch-depth: 0
         sparse-checkout: 'tarbox-games/'
+    - uses: pnpm/action-setup@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - name: Install pnpm
-      run: npm install -g pnpm
+        cache: 'pnpm'
     - run: pnpm install:tarbox-games
     - run: pnpm run clean:tarbox-games && pnpm run build:tarbox-games
     - run: pnpm test:tarbox-games
