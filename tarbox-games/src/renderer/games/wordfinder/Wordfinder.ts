@@ -8,6 +8,9 @@ Object.assign(globalThis, { Websocket });
 const URL_ERROR = "Base URL is not set.";
 const GAME_INIT_ERROR = "Game ID is not initialized while creating the WS client.";
 
+// Errors
+const P_ADDED_ERROR = "P_ADDED_ERROR";
+
 export class Wordfinder {
     private hasEnded = false;
 
@@ -23,6 +26,7 @@ export class Wordfinder {
     private totalNumOfRounds: number;
     private wordBank: string[] = [];
     private playerList : string[] = [];
+    private secretCode: string | undefined;
 
     private DEFAULT_NUM_OF_ROUNDS = 1;
 
@@ -47,7 +51,7 @@ export class Wordfinder {
         this.handleGameUpdates = this.handleGameUpdates.bind(this);
     }
 
-    public setID(id: string) {
+    private setID(id: string) {
         this.gameID = id;
     }
 
@@ -84,7 +88,7 @@ export class Wordfinder {
         }
     }
 
-    public async createGame() : Promise<string> {
+    public async createGame() : Promise<void> {
 
         const createGameBody = {
             type : 'WORD_FINDER'
@@ -101,12 +105,13 @@ export class Wordfinder {
         const createGameResponseJSON = await createGameResponse.json();
 
         if(createGameResponse.status !== 201) {
-            return Promise.reject(createGameResponseJSON['error']);
+            return Promise.reject(createGameResponseJSON.error);
         }
 
-        const gameID : string = createGameResponseJSON['id'];
+        const gameID : string = createGameResponseJSON.id;
+        const secretCode: string = createGameResponseJSON.secretCode;
         this.setID(gameID);
-        return gameID;
+        this.setSecretCode(secretCode);
     }
 
     private getPlayers() : string[] {
@@ -160,6 +165,10 @@ export class Wordfinder {
 
         let messageJSON = JSON.parse(message.body);
 
+        if(!this.validateSecretCode(messageJSON)) {
+            console.warn("Secret code does not match");
+            return;
+        }
         // Do something based on different messages
         switch(messageJSON.status) {
             case 'ERROR':
@@ -173,8 +182,13 @@ export class Wordfinder {
                     this.addPlayer(newPlayer);
                     this.onPlayerAdd?.(newPlayer);
                 }
+                else {
+                    // Player already added, send error.
+                    this.sendError(P_ADDED_ERROR);
+                }
                 break;
             case 'STARTED':
+                this.setSecretCode(messageJSON.secretCode);
                 this.runGame();
                 break;
             case 'DONE':
@@ -214,6 +228,17 @@ export class Wordfinder {
             default:
                 break;
         }
+    }
+
+    private validateSecretCode(messageJSON: any) {
+        if(!this.secretCode) {
+            console.warn("Secret code is not set");
+        }
+        return this.secretCode === messageJSON.secretCode;
+    }
+
+    private setSecretCode(code: string) {
+        this.secretCode = code;
     }
 
     public getRequestToStartCallback() {
@@ -314,9 +339,14 @@ export class Wordfinder {
 
     private publishMessageToPlayers(message: any) : Boolean {
         if(!this.wsClient) {
-            console.warn("ws client was not initated.");
+            console.warn("Websocket client was not initated.");
             return false;
         }
+
+        if(!message.secretCode) {
+            message.secretCode = this.secretCode;
+        }
+
         // Validate game ID
         this.wsClient.publish({
             destination: toPlayers(this.gameID),
@@ -418,7 +448,19 @@ export class Wordfinder {
         }
     }
 
+    private sendError(message: string) {
+        const pAddedError = {
+            status: 'ERROR',
+            message: message,
+            time: Date.now()
+        }
+
+        this.publishMessageToPlayers(pAddedError);
+
+    } 
+
     private resolvePath(path: string) : URL {
         return new URL(path, this.getBaseURL());
     }
 }
+

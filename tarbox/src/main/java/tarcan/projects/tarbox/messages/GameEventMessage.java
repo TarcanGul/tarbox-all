@@ -16,6 +16,8 @@ public class GameEventMessage {
     @NonNull
     private String gameId;
 
+    private String secretCode;
+
     private String message;
 
     private GameState status;

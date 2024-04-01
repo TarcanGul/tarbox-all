@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import tarcan.projects.tarbox.components.SecretCodeGenerator;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
 import tarcan.projects.tarbox.messages.GameEventMessage;
@@ -27,6 +28,9 @@ public class GameplayController {
 
     @Autowired
     private SimpMessagingTemplate messageSender;
+
+    @Autowired
+    private SecretCodeGenerator codeGenerator;
 
     @MessageMapping("/game/{gameId}/events/run")
     public void gameStarted(GameEventMessage message, @DestinationVariable Long gameId) throws InterruptedException {
@@ -52,6 +56,7 @@ public class GameplayController {
         }
 
         existingGame.setState(GameState.STARTED);
+        String gameSecretCode = existingGame.getSecretCode();
         gameRepository.save(existingGame);
 
         // Now broadcast to the players that the game have started.
@@ -59,6 +64,7 @@ public class GameplayController {
         res.setGameType(GameType.WORD_FINDER);
         res.setGameId(String.valueOf(gameId));
         res.setStatus(GameState.STARTED);
+        res.setSecretCode(gameSecretCode);
         res.setMessage("Game has started.");
 
         messageSender.convertAndSend(MessageDestination.toPlayers(gameId), res, null, null);

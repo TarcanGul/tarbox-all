@@ -18,6 +18,7 @@ import tarcan.projects.tarbox.converters.ListPlayerConverter;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
 import tarcan.projects.tarbox.utilities.MaxPlayersReachedException;
+import tarcan.projects.tarbox.utilities.PlayerNameAlreadyExistsException;
 
 @Entity
 @Table(name = "games") 
@@ -42,6 +43,11 @@ public class Game {
     @Setter
     private GameState state;
 
+    @Column(name = "secret_code")
+    @Getter
+    @Setter
+    private String secretCode;
+
     public Game(GameType type) {
         this.type = type;
         this.otherPlayers = new ArrayList<>(TarboxConfiguration.NUMBER_OF_JOINING_PLAYERS);
@@ -64,10 +70,14 @@ public class Game {
         return state == GameState.STARTED;
     }
 
-    public boolean addPlayer(String player) throws MaxPlayersReachedException {
+    public boolean addPlayer(String player) throws MaxPlayersReachedException, PlayerNameAlreadyExistsException {
 
         if(otherPlayers.size() >= TarboxConfiguration.NUMBER_OF_JOINING_PLAYERS) {
             throw new MaxPlayersReachedException();
+        }
+
+        if(otherPlayers.contains(player)) {
+            throw new PlayerNameAlreadyExistsException();
         }
 
         return otherPlayers.add(player);

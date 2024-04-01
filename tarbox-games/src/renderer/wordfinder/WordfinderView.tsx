@@ -123,12 +123,22 @@ const WordfinderView = () => {
                 }
             };
 
-            const wordfinder : Wordfinder = await new WordfinderBuilder()
+            let wordfinder: Wordfinder;
+            try {
+                wordfinder = await new WordfinderBuilder()
                 .withStateHandlers(handlers)
                 .withWebsocketServer(websocketURL)
                 .build();
-            startHandler.current = wordfinder.getRequestToStartCallback();
-            setViewState({...viewState, gameID: wordfinder.getID()});
+
+                startHandler.current = wordfinder.getRequestToStartCallback();
+                setViewState({...viewState, gameID: wordfinder.getID()});
+            }
+            catch(e: any) {
+                setTimeout(() => {
+                    viewHandler.home?.();
+                }, 3000);
+                setViewState({...viewState, error: e.message})
+            }
         };
 
         gameSetup();
@@ -296,6 +306,14 @@ const DisconnectedView = () => {
     return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
         <Center w='inherit' h='80%'>
             <Heading as='h1' color='whitesmoke'>Disconnected. Going back to home menu.</Heading>
+        </Center>
+    </Box>  
+}
+
+const ErrorView = ( {message = "Error has occured."}) => {
+    return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
+        <Center w='inherit' h='80%'>
+            <Heading as='h1' color='whitesmoke'>{message}</Heading>
         </Center>
     </Box>  
 }

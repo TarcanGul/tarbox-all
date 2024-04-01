@@ -52,8 +52,12 @@ export class WordfinderBuilder {
         this.gameInstance.setListeners(this.listeners);
         this.gameInstance.setBaseURL(this.tarboxServerUrl);
 
-        let gameID : string = await this.gameInstance.createGame();
-        this.gameInstance.setID(gameID);
+        try {
+            await this.gameInstance.createGame();
+        }
+        catch(e) {
+            return Promise.reject(e);
+        }
 
         this.gameInstance.setupWSClient(this.wsBrokerUrl);
 

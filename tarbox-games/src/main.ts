@@ -28,7 +28,6 @@ const createWindow = () => {
     })
     
     ipcMain.handleOnce('cleanup-complete', () => {
-        console.log("Cleanup done!");
         window.destroy();
         app.quit();
     })

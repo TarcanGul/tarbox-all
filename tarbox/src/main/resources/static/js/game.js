@@ -7,6 +7,9 @@ pageFrame.classList.add('game-page');
 game.appendChild(pageFrame);
 
 const toGameServer = (gameId) => `/game/${gameId}/events/server`;
+let statusTextIsUp = false;
+
+let secretCode;
 
 const mq = {
   queue: [],
@@ -32,14 +35,19 @@ function runGame() {
         .find((val) => val.startsWith("tarbox_gameid="))
         ?.split('=')[1];
 
+      if(gameId === undefined) {
+        return new Error("Game id cannot be retrieved.");
+      }
+
       const playerName = document.cookie
       .split("; ")
       .find((val) => val.startsWith("tarbox_username="))
       ?.split('=')[1];
 
-      if(gameId === undefined) {
-        return new Error("Game id cannot be retrieved.");
-      }
+      secretCode = document.cookie
+      .split("; ")
+      .find((val) => val.startsWith("tarbox_secret_code="))
+      ?.split('=')[1];
 
       // Check if already notified.
       
@@ -52,7 +60,8 @@ function runGame() {
       await updateUI({
         status: currentStatus,
         game: gameId,
-        currentPlayer: playerName
+        currentPlayer: playerName,
+        secretCode: secretCode
       });
 
       const subscription = client.subscribe(`/game/${gameId}/actions`, async (message) => {
@@ -71,11 +80,11 @@ function runGame() {
     }
     
     client.onStompError = async function (frame) {
-      await updateUI({status: "ERROR", message: frame.headers['message'], details: frame.body});
+      await updateUI({status: "ERROR", message: frame.headers['message'], details: frame.body, secretCode: secretCode});
     };
 
     client.onDisconnect = async function(frame) {
-      await updateUI({status: "DISCONNECTED"});
+      await updateUI({status: "DISCONNECTED", secretCode: secretCode});
     }
     
     client.activate();
@@ -94,6 +103,12 @@ function runGame() {
  */
 async function updateUI(current) {
   clearGame();
+
+  if(!validateSecretCode(current)) {
+    console.warn("Cannot enter this url.");
+    return;
+  }
+
   switch(current.status) {
     case 'STARTED': 
       const startedView = document.createElement('started-view');
@@ -126,6 +141,7 @@ async function updateUI(current) {
             prompt: prompt,
             gameId: current.game,
             player: current.currentPlayer,
+            secretCode: secretCode,
             time: Date.now()
           }
 
@@ -163,6 +179,7 @@ async function updateUI(current) {
             word: answer,
             gameId: current.game,
             player: current.currentPlayer,
+            secretCode: secretCode,
             time: Date.now()
           }
           
@@ -205,6 +222,10 @@ async function updateUI(current) {
       pageFrame.appendChild(disconnectedView);
       break;
     case 'ERROR':
+      if(current.message = "P_ADDED_ERROR") {
+
+        return;
+      }
       const errorView = document.createElement('error-view');
       if(current.message) {
         errorView.message = current.message;
@@ -232,7 +253,8 @@ async function processMessage(gameId, wsClient, player) {
       status: messageBody.status,
       game: gameId,
       client: wsClient,
-      currentPlayer: player
+      currentPlayer: player,
+      secretCode: messageBody.secretCode
     })
   }
   mq.isProcessing = false;
@@ -243,7 +265,8 @@ function notifyPlayerEntry(client, gameId, playerName) {
   const playerEntryBody = {
     status: 'P_ADDED',
     gameId: gameId,
-    player: playerName
+    player: playerName,
+    secretCode: secretCode
   }
 
   client.publish({
@@ -267,7 +290,10 @@ function getWebsocketServer() {
   return resultWSURL;
 }
 
-let statusTextIsUp = false;
+function validateSecretCode(message) {
+  console.warn("secret code is not intiated");
+  return message.secretCode === secretCode;
+}
 
 function notify(text) {
     if(statusTextIsUp) {

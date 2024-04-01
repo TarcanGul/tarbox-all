@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.resilience4j.core.lang.NonNull;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.servlet.http.HttpServletRequest;
+import tarcan.projects.tarbox.components.SecretCodeGenerator;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
 import tarcan.projects.tarbox.messages.GameEventMessage;
@@ -29,6 +31,7 @@ import tarcan.projects.tarbox.models.Game;
 import tarcan.projects.tarbox.repositories.GameRepository;
 import tarcan.projects.tarbox.utilities.MaxPlayersReachedException;
 import tarcan.projects.tarbox.utilities.MessageDestination;
+import tarcan.projects.tarbox.utilities.PlayerNameAlreadyExistsException;
 
 @RestController
 @RequestMapping("/api")
@@ -42,6 +45,9 @@ public class GameController {
 
     @Autowired
     private SimpMessagingTemplate messageSender;
+
+    @Autowired
+    private SecretCodeGenerator codeGenerator;
 
     @GetMapping("/games/{gameId}") 
     public ResponseEntity<Game> getGame(@PathVariable Long gameId) {
@@ -98,15 +104,17 @@ public class GameController {
                 Game game = gameWithId.get();
                 if(game.addPlayer(player)) {
                     logger.info(String.format("Player %s has been added to game %d", player, id));
-                    return ResponseEntity.ok().body(gameRepository.save(game));
+                    gameRepository.save(game);
+                    return ResponseEntity.ok().body(Collections.singletonMap("secretCode", game.getSecretCode()));
                 }
                 else return ResponseEntity.internalServerError().body(null);
             }
             catch (MaxPlayersReachedException e) {
-                return ResponseEntity.badRequest().header("message", e.getMessage()).body(null);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).header("error_type", "MAX_PLAYERS_REACHED").body(Collections.singletonMap("message",  e.getMessage()));
             }
-            
-            
+            catch (PlayerNameAlreadyExistsException e) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).header("error_type", "PLAYER_ALREADY_EXISTS").body(Collections.singletonMap("message",  e.getMessage()));
+            }         
         }
         else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "The game with the id is not found."));
@@ -136,9 +144,12 @@ public class GameController {
             }
             Game toBeCreatedGame = new Game(GameType.valueOf(type));
             toBeCreatedGame.setState(GameState.NOT_STARTED);
+            String secretCode = codeGenerator.generateCode();
+            toBeCreatedGame.setSecretCode(secretCode);
             Game createdGame = gameRepository.save(toBeCreatedGame);
             logger.info(String.format("Game with id %d has been created.", createdGame.getID()));
             returnBody.put("id", createdGame.getID());
+            returnBody.put("secretCode", secretCode);
             return ResponseEntity.status(HttpStatus.CREATED).body(returnBody.toString());
         }
         catch(MaxPlayersReachedException e) {
@@ -151,6 +162,7 @@ public class GameController {
 
     @PutMapping("/games/{gameId}")
     public ResponseEntity<String> updateGame(@PathVariable Long gameId, @RequestBody String body, HttpServletRequest request) {
+        logger.info("Updating game status for game " + gameId);
         JSONObject result = new JSONObject();
         if(gameId == null) {
             result.put("error", "No game was sent.");
@@ -158,7 +170,6 @@ public class GameController {
         }
 
         Optional<Game> gameOption = gameRepository.findByID(gameId);
-
         if(gameOption.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -167,6 +178,7 @@ public class GameController {
 
         switch (operation.toUpperCase()) {
             case "END": 
+                logger.info("Ending game " + gameId);
                 Game game = gameOption.get();
                 game.setState(GameState.ENDED);
                 gameRepository.save(game);
