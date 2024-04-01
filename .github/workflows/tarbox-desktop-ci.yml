@@ -37,6 +37,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
+        cache-dependency-path: 'tarbox-games/pnpm-lock.yaml'
     - run: pnpm install:tarbox-games
     - run: pnpm run clean:tarbox-games && pnpm run build:tarbox-games
     - run: pnpm test:tarbox-games
