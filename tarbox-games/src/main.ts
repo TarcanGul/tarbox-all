@@ -9,7 +9,8 @@ const createWindow = () => {
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: true,
+            devTools: app.isPackaged ? false : true
         },
         width: 1000,
         height: 1000

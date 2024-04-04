@@ -4,8 +4,9 @@
     tarboxRemoteProcedures : {
         loadWordBank: (type: string): Promise<string[]> => ipcRenderer.invoke('load-word-bank', type),
         onQuit: (cb: (e: IpcRendererEvent, ...args: any) => void): void => {
+            ipcRenderer.removeAllListeners('quit');
             ipcRenderer.once('quit', cb)
         } ,
-        cleanupComplete: (): Promise<void> => ipcRenderer.invoke('cleanup-complete')
+        cleanupComplete: (): Promise<void> => ipcRenderer.invoke('cleanup-complete'),
     }
  })

@@ -1,7 +1,7 @@
 import React, { ReactElement, useContext, useEffect, useRef, useState } from "react";
 import { WordfinderBuilder } from "../games/wordfinder/WordfinderBuilder";
-import { PlayerStats, TarboxViewHandler } from "../../types";
-import { Text, Spinner, List, ListItem, Heading, Box, Button, useToast, Container, VStack, Center, HStack, Flex, Tooltip, Square, Spacer, ScaleFade, useDisclosure, useTimeout, Fade, Slide, SlideFade } from '@chakra-ui/react';
+import { PlayerStats } from "../../types";
+import { Text, Spinner, Heading, Box, Button, useToast, VStack, Center, HStack, Flex, Tooltip, Square } from '@chakra-ui/react';
 import { DEFAULT_TRANSITION, PALETTE } from "../../constants";
 import { appBackgroundGradient } from "../theme";
 import { Wordfinder } from "../games/wordfinder/Wordfinder";
@@ -89,11 +89,31 @@ const WordfinderView = () => {
         answerMap: new Map<string, string>(),
         correctAnswer: ''
     });
+
     const startHandler = useRef(() => {});
     const context = useContext(AppContext);
 
     const viewHandler = context.viewHandlerProvider.get();
     const websocketURL = context.tarboxWebsocketURL;
+
+    const showMessage = useToast();
+    const id = 'wordfinder-toast';
+
+    if(viewState.error && !showMessage.isActive(id)) {
+        showMessage({
+            id,
+            title: "Error",
+            description: viewState.error,
+            status: 'error',
+            duration: 3000,
+        });
+    }
+
+    // @ts-ignore
+    globalThis.electron.tarboxRemoteProcedures.onQuit(() => {
+        // @ts-ignore
+        globalThis.electron.tarboxRemoteProcedures.cleanupComplete();
+    })
 
     useEffect(() => {
         const gameSetup = async () => {
@@ -134,6 +154,7 @@ const WordfinderView = () => {
                 setViewState({...viewState, gameID: wordfinder.getID()});
             }
             catch(e: any) {
+                console.log(e);
                 setTimeout(() => {
                     viewHandler.home?.();
                 }, 3000);
@@ -147,7 +168,7 @@ const WordfinderView = () => {
 
     switch(viewState.page) {
         case WordfinderPage.InitialView:
-            return <InitialView gameID={viewState.gameID} players={viewState.players} error={viewState.error} startHandler={startHandler.current}/>;
+            return <InitialView gameID={viewState.gameID} players={viewState.players} startHandler={startHandler.current}/>;
         case WordfinderPage.WaitingView:
             return <WaitingView player={viewState.currentPlayer} playerStatsMap={viewState.playerStatsMap}/>
         case WordfinderPage.WordAndPromptSubmittedView:
@@ -161,7 +182,7 @@ const WordfinderView = () => {
     }
 }
 
-const InitialView = ( {gameID, players, error, startHandler} : any ) => {
+const InitialView = ( {gameID, players, startHandler} : any ) => {
 
     const canStart = players.length >= 3;
 
@@ -169,7 +190,6 @@ const InitialView = ( {gameID, players, error, startHandler} : any ) => {
         <Center w='inherit' h='inherit'>
             <VStack gap='5vh' color='whitesmoke' paddingTop='10vh' w='inherit' h='inherit'>
             <TransitionForEach delay={0.1}>
-                    {error ? <Error error={error}></Error> : <></>}
                     <Heading size='2xl' fontWeight='800' fontStyle='italic'> Wordfinder </Heading>
                     <Heading size='xl'> Welcome! </Heading>
                     <Flex gap='2vw' alignContent='center' alignItems='center'>
@@ -310,14 +330,6 @@ const DisconnectedView = () => {
     </Box>  
 }
 
-const ErrorView = ( {message = "Error has occured."}) => {
-    return <Box bgGradient={appBackgroundGradient} w='100vw' h='100vh' fontFamily='body'>
-        <Center w='inherit' h='80%'>
-            <Heading as='h1' color='whitesmoke'>{message}</Heading>
-        </Center>
-    </Box>  
-}
-
 /*****  Helper Components *****/
 
 const PointBar = ( { players } : PointBarProps ) => {
@@ -353,16 +365,6 @@ const PlayerList = ( {players} : {players: string[]} ) => {
                     key={index}>{player}</Text>) 
                 }
         </Flex>
-}
-
-const Error = ( {errorMessage} : any ) => {
-    const error = useToast();
-    return error({
-        title: errorMessage,
-        description: errorMessage,
-        status: 'error',
-        duration: 3000,
-    });
 }
 
 const Timeout = ( {children, time} : any ) => {

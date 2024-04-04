@@ -56,7 +56,9 @@ export class WordfinderBuilder {
             await this.gameInstance.createGame();
         }
         catch(e) {
-            return Promise.reject(e);
+            return Promise.reject({
+                message: "The game cannot be created right now."
+            });
         }
 
         this.gameInstance.setupWSClient(this.wsBrokerUrl);

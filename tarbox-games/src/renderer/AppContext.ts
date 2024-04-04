@@ -19,12 +19,12 @@ class ViewHandlerProvider {
 
 type TarboxConfig = {
     tarboxWebsocketURL: URL,
-    viewHandlerProvider: ViewHandlerProvider,
+    viewHandlerProvider: ViewHandlerProvider
 }
 
 const config : TarboxConfig = {
     ...tarboxAppConfig,
-    viewHandlerProvider: new ViewHandlerProvider()
+    viewHandlerProvider: new ViewHandlerProvider(),
 };
 
 const AppContext = React.createContext(config);
