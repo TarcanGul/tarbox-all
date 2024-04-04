@@ -38,3 +38,7 @@ class ErrorView extends HTMLElement {
         return this.#details;
     }
 }
+
+export default ErrorView;
+
+customElements.define('error-view', ErrorView);

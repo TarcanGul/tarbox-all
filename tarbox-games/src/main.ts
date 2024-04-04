@@ -20,6 +20,7 @@ const createWindow = () => {
 
     window.on('close', (e) => {
         e.preventDefault();
+        
         window.webContents.send('quit');
     });
 

@@ -16,6 +16,13 @@ const App = () => {
 
     const [page, setPage] = useState(AppPage.Home);
 
+    // @ts-ignore
+    globalThis.electron.tarboxRemoteProcedures.onQuit(async (event) => {
+
+        // @ts-ignore
+        globalThis.electron.tarboxRemoteProcedures.cleanupComplete();
+    });
+
     const viewHandler : TarboxViewHandler = {
         home: () => setPage(AppPage.Home),
         wordfinder: () => setPage(AppPage.Wordfinder)

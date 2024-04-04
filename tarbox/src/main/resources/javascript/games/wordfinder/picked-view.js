@@ -1,4 +1,4 @@
-class PickedView extends HTMLElement {
+export class PickedView extends HTMLElement {
     constructor() {
         super();
     }
@@ -67,5 +67,7 @@ class PickedView extends HTMLElement {
         this.#answerWord = value;
     }
 }
+
+export default PickedView;
 
 customElements.define('picked-view', PickedView);

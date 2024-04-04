@@ -1,3 +1,6 @@
+import EndedView from "./wordfinder/ended-view";
+import PickedView from "./wordfinder/picked-view";
+
 window.addEventListener('load', (e) => runGame());
 
 const game = document.querySelector("main");

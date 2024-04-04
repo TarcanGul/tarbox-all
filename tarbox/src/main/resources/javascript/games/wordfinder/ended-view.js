@@ -1,4 +1,4 @@
-class EndedView extends HTMLElement {
+export class EndedView extends HTMLElement {
     constructor() {
         super();
     }
@@ -35,5 +35,7 @@ class EndedView extends HTMLElement {
         return this.getAttribute('redirectMessage');
     }
 }
+
+export default EndedView;
 
 customElements.define('ended-view', EndedView);
