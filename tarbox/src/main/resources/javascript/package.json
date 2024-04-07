@@ -16,6 +16,11 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "glob": "^10.3.12",
-    "rollup": "^4.13.2"
+    "rollup": "^4.13.2",
+    "rollup-plugin-node-polyfills": "^0.2.1"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken-esm": "^2.0.1"
   }
 }

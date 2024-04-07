@@ -29,7 +29,7 @@ import tarcan.projects.tarbox.utilities.MaxPlayersReachedException;
 import tarcan.projects.tarbox.utilities.PlayerNameAlreadyExistsException;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/games")
 @RateLimiter(name = "tarbox-api")
 public class GameController {
 
@@ -41,7 +41,7 @@ public class GameController {
     @Autowired
     private SecretCodeGenerator codeGenerator;
 
-    @GetMapping("/games/{gameId}") 
+    @GetMapping("/{gameId}") 
     public ResponseEntity<Game> getGame(@PathVariable Long gameId) {
         try {
             if(gameId == null) {
@@ -62,7 +62,7 @@ public class GameController {
         }
     }
 
-    @GetMapping("/games/{gameId}/players")
+    @GetMapping("/{gameId}/players")
     public ResponseEntity<Object> getPlayers(@PathVariable Long gameId) {
         Optional<Game> gameWithId = gameRepository.findByID(gameId);
 
@@ -75,7 +75,7 @@ public class GameController {
         return ResponseEntity.ok().body(currentGame.getOtherPlayers());
     } 
 
-    @PostMapping("/games/players")
+    @PostMapping("/players")
     public ResponseEntity<Object> addPlayerToGame(@RequestBody Map<String, String> request) {
         String player = request.get("player");
         Long id; 
@@ -122,7 +122,7 @@ public class GameController {
      * @param request
      * @return A JSON Object with id property if succesful, error if not.
      */
-    @PostMapping("/games")
+    @PostMapping("/")
     public ResponseEntity<String> createGame(@RequestBody String body, HttpServletRequest request) {
         JSONObject returnBody = new JSONObject();
         if(body == null || body.isEmpty()) {
@@ -152,7 +152,7 @@ public class GameController {
         }
     }
 
-    @PutMapping("/games/{gameId}")
+    @PutMapping("/{gameId}")
     public ResponseEntity<String> updateGame(@PathVariable Long gameId, @RequestBody String body, HttpServletRequest request) {
         JSONObject result = new JSONObject();
         if(gameId == null) {
@@ -180,7 +180,7 @@ public class GameController {
         }
     }
 
-    @GetMapping("/games/{gameId}/state")
+    @GetMapping("/{gameId}/state")
     public ResponseEntity<String> getGameState(@PathVariable Long gameId) {
         Optional<Game> gameOption = gameRepository.findByID(gameId);
 

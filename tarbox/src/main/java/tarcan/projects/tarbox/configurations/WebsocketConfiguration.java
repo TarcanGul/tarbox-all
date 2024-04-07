@@ -1,4 +1,4 @@
-package tarcan.projects.tarbox;
+package tarcan.projects.tarbox.configurations;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

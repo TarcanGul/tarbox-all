@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import multi from '@rollup/plugin-multi-entry';
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 import { glob } from 'glob';
 
 const gameFiles = glob.sync('games/**/*.js');
@@ -20,8 +21,7 @@ export const gameConfig = {
   external: ['@stomp/stompjs'],
   plugins: [
     multi(),
-    resolve(),
-    commonjs({
+    resolve({
       browser: true
     }),
     terser(), 
@@ -37,11 +37,30 @@ export const homeConfig = {
   },
   plugins: [
     multi(),
-    resolve(),
+    resolve({
+      browser: true
+    }),
     terser(), 
   ],
 };
 
-export default [homeConfig, gameConfig];
+export const downloadConfig = {
+  input: 'download.js',
+  output: {
+    file: '../static/js/download.min.js', // Output directory
+    format: 'es',
+    sourcemap: true, // Optional: Enable source maps
+  },
+  plugins: [
+    multi(),
+    resolve({
+      browser: true
+    }),
+    commonjs(), 
+    // terser(), 
+  ],
+};
+
+export default [homeConfig, gameConfig, downloadConfig];
 
 

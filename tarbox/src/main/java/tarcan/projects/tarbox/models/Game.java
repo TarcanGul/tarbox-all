@@ -13,7 +13,7 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import tarcan.projects.tarbox.TarboxConfiguration;
+import tarcan.projects.tarbox.configurations.TarboxConfiguration;
 import tarcan.projects.tarbox.converters.ListPlayerConverter;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;

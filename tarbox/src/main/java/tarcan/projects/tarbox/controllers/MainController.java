@@ -48,7 +48,7 @@ public class MainController {
 
     @GetMapping("/download")
     public String downloadPage() {
-        return "forward:/pages/download.html";
+        return "forward:/html/download.html";
     }
     
 }

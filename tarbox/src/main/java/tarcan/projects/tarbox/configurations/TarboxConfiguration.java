@@ -1,4 +1,4 @@
-package tarcan.projects.tarbox;
+package tarcan.projects.tarbox.configurations;
 
 import java.security.SecureRandom;
 
