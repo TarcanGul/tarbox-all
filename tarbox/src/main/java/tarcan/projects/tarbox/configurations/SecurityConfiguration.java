@@ -1,5 +1,7 @@
 package tarcan.projects.tarbox.configurations;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -27,7 +29,7 @@ public class SecurityConfiguration {
     private OncePerRequestFilter eventRequestFilter;
 
     @PostConstruct
-    public void initialize() {
+    public void initialize() throws UnknownHostException {
         eventRequestFilter = new EventRequestFilter(Arrays.asList(eventAllowedOrigins));
     }
 

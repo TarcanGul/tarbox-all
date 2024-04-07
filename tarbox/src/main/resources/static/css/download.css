@@ -23,17 +23,11 @@ main > h2 {
     gap: 1vh;
 }
 
-.download > a {
-    font-family: 'pt-sans', sans-serif;
-    font-size: medium;
-    text-decoration: underline;
-    transition: transform 0.1s ease-in-out;
-    color: var(--ternary);
-    display: inline-block;
-    overflow-wrap:break-word;
-    transition: transform 0.1s ease-in-out;
+.download > button {
+    width: calc(8rem + 10vw);
 }
 
-.download > a:hover {
+.download > button:hover {
     transform: scale(1.1);
+    cursor: pointer;
 }

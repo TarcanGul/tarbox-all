@@ -57,8 +57,6 @@ public class EventsController {
 
     @PostMapping("/download")
     public String writeDownloadStat(@RequestBody String os, HttpServletRequest request) {
-        logger.info("Write download called with os " + os);
-        logger.info(request.getRequestURL().toString());
         JSONObject response = new JSONObject();
         if(os == null) {
             response.put("error", "Invalid request");
@@ -69,30 +67,28 @@ public class EventsController {
         String eventType = deserializedBody.getString("event");
 
         TarboxEventType givenStatisticType;
-        logger.info("Starting...");
         try {
             givenStatisticType = TarboxEventType.valueOf(eventType);
-            logger.info(givenStatisticType.getTypeString());
         }
         catch(IllegalArgumentException e) {
-            logger.info(e.getMessage());
-            response.put("error", "The statistic is not valid");
+            logger.error(e.getMessage());
+            response.put("error", "The event is not valid");
             return ResponseEntity.badRequest().body(response).toString();
         }
         catch (Exception e) {
-            logger.info(e.getMessage());
+            logger.error(e.getMessage());
             response.put("error", "An error occured.");
             return ResponseEntity.badRequest().body(response).toString();
         }
         
         TarboxEvent toBeCreatedStatistic = new TarboxEvent();
         toBeCreatedStatistic.setStatisticType(givenStatisticType);
-        logger.info(givenStatisticType.getTypeString());
         try {
             statistics.save(toBeCreatedStatistic);
-            logger.info("Write successful.");
+            logger.info("Game Download: " + givenStatisticType.getTypeString());
         }
         catch(Exception e) {
+            logger.error(e.getMessage());
             response.put("error", "An error occured.");
             return ResponseEntity.badRequest().body(response).toString();
         }

@@ -27,6 +27,7 @@ public class EventRequestFilter extends OncePerRequestFilter {
     private List<String> allowedOrigins;
 
     private static String ORIGIN_HEADER = "Origin";
+    private static String AUTH_HEADER = "Authorization";
 
     public EventRequestFilter(List<String> allowedOrigins) {
         super();
@@ -40,12 +41,9 @@ public class EventRequestFilter extends OncePerRequestFilter {
         @NonNull FilterChain filterChain
         ) throws ServletException, IOException {
 
-        logger.info("JwtEventRequestFilter is triggered for request " + request.getMethod() + " " + request.getRequestURI());
+        logger.debug("EventRequestFilter is triggered for request " + request.getMethod() + " " + request.getRequestURI());
 
         String requestOrigin = request.getHeader(ORIGIN_HEADER);
-
-        logger.info(allowedOrigins == null ? "null" : "not null");
-        logger.info(requestOrigin);
 
         if(requestOrigin == null) {
             response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -57,18 +55,6 @@ public class EventRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        // try {
-        //     Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwt).getBody();
-        //     boolean stat = (boolean) claims.get("stat");
-
-        //     if(!stat) {
-        //         throw new IllegalArgumentException("Invalid JWT Token.");
-        //     }
-        // }
-        // catch (Exception e) {
-        //     response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        //     return;
-        // }
         filterChain.doFilter(request, response);
     }
 }
