@@ -1,34 +1,112 @@
-document.querySelector('#mac-link').addEventListener('click', async (e) => {
-    console.log('download clicked');
+import { notify } from "./util";
 
-    // const jwtPayload = {
-    //     stat: true
-    // }
+document.querySelector('#windows-link').addEventListener('click', async (e) => {
+    const download = await fetch('/desktop-dists/Tarbox Desktop Setup 1.0.0.exe');
 
-    // const SECRET_KEY = "something";
-
-    // const token = sign(jwtPayload, SECRET_KEY);
-
-    // const authorizationHeader = "Bearer " + token; 
-
-    const headers = new Headers();
-    // headers.append("Authorization", authorizationHeader);
-
-    const payload = {
-        event: 'DOWNLOAD_MAC'
+    if(!download.ok) {
+        notify("Download is not successful");
+        return;
     }
 
-    const res = await fetch("/api/app/event/download", {
+    const file = await download.blob();
+
+    if(!file) {
+        notify("Download is not successful");
+        return;
+    }
+
+    try {
+        executeDownload(file,  "Tarbox-Windows-Installer.dmg");
+    }
+    catch(e) {
+        notify(e);
+        return;
+    }
+
+    // Sending the event async, no need to wait.
+    fetch("/api/app/event/download", {
         method: 'POST',
-        headers: headers,
-        body: JSON.stringify(payload)
-    })
+        body: JSON.stringify( {
+            event: 'DOWNLOAD_WINDOWS'
+        })
+    });
+});
 
-    if(!res.ok) {
-        console.warn(`Event is not sent, response ${res.status}`);
-    }
-    else {
-        console.log('Event is sent!');
+document.querySelector('#mac-link').addEventListener('click', async (e) => {
+    const download = await fetch('/desktop-dists/Tarbox Desktop-1.0.0-arm64.dmg');
+
+    if(!download.ok) {
+        notify("Download is not successful");
+        return;
     }
 
+    const file = await download.blob();
+
+    if(!file) {
+        notify("Download is not successful");
+        return;
+    }
+
+    try {
+        executeDownload(file,  "Tarbox-Mac-Installer.dmg");
+    }
+    catch(e) {
+        notify(e);
+        return;
+    }
+
+    // Sending the event async, no need to wait.
+    fetch("/api/app/event/download", {
+        method: 'POST',
+        body: JSON.stringify( {
+            event: 'DOWNLOAD_MAC'
+        })
+    });
 })
+
+document.querySelector('#linux-link').addEventListener('click', async (e) => {
+    const download = await fetch('/desktop-dists/Tarbox Desktop-1.0.0-arm64.AppImage');
+
+    if(!download.ok) {
+        notify("Download is not successful");
+        return;
+    }
+
+    const file = await download.blob();
+
+    if(!file) {
+        notify("Download is not successful");
+        return;
+    }
+
+    try {
+        executeDownload(file,  "Tarbox-Linux-Installer.dmg");
+    }
+    catch(e) {
+        notify(e);
+        return;
+    }
+
+    // Sending the event async, no need to wait.
+    fetch("/api/app/event/download", {
+        method: 'POST',
+        body: JSON.stringify( {
+            event: 'DOWNLOAD_LINUX'
+        })
+    });
+})
+
+/**
+ * @param {*} fileBlob Awaited blob
+ * @param {*} filename Filename that is going to be set in the client after download.
+ */
+function executeDownload(fileBlob, filename) {
+    const fileLink = URL.createObjectURL(fileBlob);
+    const anchor = document.createElement('a');
+    anchor.href = fileLink;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(fileLink);
+}

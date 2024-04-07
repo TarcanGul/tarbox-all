@@ -1,5 +1,4 @@
-import EndedView from "./wordfinder/ended-view";
-import PickedView from "./wordfinder/picked-view";
+import { notify } from "../util";
 
 window.addEventListener('load', (e) => runGame());
 
@@ -10,7 +9,6 @@ pageFrame.classList.add('game-page');
 game.appendChild(pageFrame);
 
 const toGameServer = (gameId) => `/game/${gameId}/events/server`;
-let statusTextIsUp = false;
 
 let secretCode;
 
@@ -297,37 +295,3 @@ function validateSecretCode(message) {
   console.warn("secret code is not intiated");
   return message.secretCode === secretCode;
 }
-
-function notify(text) {
-    if(statusTextIsUp) {
-        return;
-    }
-    let statusArea = document.querySelector(".status-text");
-    const statusText = document.createElement('h3');
-    fadeIn(statusArea);
-    statusText.innerText = text;
-    statusTextIsUp = true;
-    statusArea.appendChild(statusText);
-    setTimeout(() => {
-        fadeOut(statusArea);
-    }, 3000);
-}
-
-function fadeIn(element) {
-    element.classList.remove('fade-out-animate');
-    element.classList.add('fade-in-animate');
-}
-
-function fadeOut(element) {
-    element.classList.remove('fade-in-animate');
-    element.classList.add('fade-out-animate');
-}
-
-document.querySelector(".status-text").addEventListener('animationend', (e) => {
-    if(e.animationName === 'fadeOut') {
-        while(e.target.firstChild) {
-            e.target.removeChild(e.target.firstChild);
-        }
-        statusTextIsUp = false;
-    }
-});
