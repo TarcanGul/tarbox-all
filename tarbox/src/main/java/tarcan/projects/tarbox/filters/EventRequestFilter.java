@@ -22,12 +22,9 @@ public class EventRequestFilter extends OncePerRequestFilter {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static final String SECRET_KEY = "something";
-
     private List<String> allowedOrigins;
 
     private static String ORIGIN_HEADER = "Origin";
-    private static String AUTH_HEADER = "Authorization";
 
     public EventRequestFilter(List<String> allowedOrigins) {
         super();

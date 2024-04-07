@@ -3,6 +3,7 @@ package tarcan.projects.tarbox.configurations;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.annotation.PostConstruct;
 import tarcan.projects.tarbox.filters.EventRequestFilter;
+import tarcan.projects.tarbox.filters.GamesApiRequestFilter;
 
 @Configuration
 public class SecurityConfiguration {
@@ -26,8 +28,11 @@ public class SecurityConfiguration {
     @Value("${tarbox.events.allowedorigins}")
     private String[] eventAllowedOrigins;
 
-    private OncePerRequestFilter eventRequestFilter;
+    @Value("${tarbox.games.allowedorigins}")
+    private String[] gamesAllowedOrigins;
 
+    private OncePerRequestFilter eventRequestFilter;
+    
     @PostConstruct
     public void initialize() throws UnknownHostException {
         eventRequestFilter = new EventRequestFilter(Arrays.asList(eventAllowedOrigins));

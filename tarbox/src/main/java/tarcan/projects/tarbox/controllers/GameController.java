@@ -122,7 +122,7 @@ public class GameController {
      * @param request
      * @return A JSON Object with id property if succesful, error if not.
      */
-    @PostMapping("/")
+    @PostMapping()
     public ResponseEntity<String> createGame(@RequestBody String body, HttpServletRequest request) {
         JSONObject returnBody = new JSONObject();
         if(body == null || body.isEmpty()) {
