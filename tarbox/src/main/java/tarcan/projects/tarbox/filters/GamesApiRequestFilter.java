@@ -17,13 +17,10 @@ public class GamesApiRequestFilter extends OncePerRequestFilter {
 
     Logger logger = LoggerFactory.getLogger(GamesApiRequestFilter.class);
 
-    private List<String> allowedOrigins;
+    private static final String USER_AGENT = "User-Agent";
 
-    private static String ORIGIN_HEADER = "Origin";
-
-    public GamesApiRequestFilter(List<String> allowedOrigins) {
+    public GamesApiRequestFilter() {
         super();
-        this.allowedOrigins = allowedOrigins;
     }
 
 
@@ -31,6 +28,22 @@ public class GamesApiRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         logger.debug("GamesApiRequestFilter is triggered for request " + request.getMethod() + " " + request.getRequestURI());
+
+        String userAgent = request.getHeader(USER_AGENT);
+
+        if(userAgent == null) {
+            response.sendError(400, "User agent is required.");
+            return;
+        }
+
+        String[] productStringSplit = userAgent.split("/");
+
+        String product = productStringSplit[0];
+
+        if(!product.equalsIgnoreCase("Tarbox")) {
+            response.sendError(403, "Only Tarbox desktop clients can call into the games api.");
+            return;
+        }
 
         filterChain.doFilter(request, response);
     }

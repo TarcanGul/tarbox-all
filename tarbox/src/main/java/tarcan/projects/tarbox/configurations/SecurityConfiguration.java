@@ -1,17 +1,27 @@
 package tarcan.projects.tarbox.configurations;
 
-import java.net.Inet4Address;
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,6 +31,7 @@ import tarcan.projects.tarbox.filters.EventRequestFilter;
 import tarcan.projects.tarbox.filters.GamesApiRequestFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration {
 
     Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
@@ -28,14 +39,14 @@ public class SecurityConfiguration {
     @Value("${tarbox.events.allowedorigins}")
     private String[] eventAllowedOrigins;
 
-    @Value("${tarbox.games.allowedorigins}")
-    private String[] gamesAllowedOrigins;
-
     private OncePerRequestFilter eventRequestFilter;
+    private OncePerRequestFilter gameRequestFilter;
+
     
     @PostConstruct
     public void initialize() throws UnknownHostException {
         eventRequestFilter = new EventRequestFilter(Arrays.asList(eventAllowedOrigins));
+        gameRequestFilter  = new GamesApiRequestFilter();
     }
 
     @Bean
@@ -44,6 +55,17 @@ public class SecurityConfiguration {
             .csrf(csrf -> csrf.disable())
             .securityMatcher("/api/app/event/**")
             .addFilterBefore(eventRequestFilter,UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public SecurityFilterChain gamesFilterChain(HttpSecurity http) throws Exception {
+
+        http
+            .csrf(csrf -> csrf.disable())
+            .securityMatcher("/api/games/**")
+            .addFilterBefore(gameRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
