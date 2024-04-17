@@ -98,7 +98,8 @@ export class Wordfinder {
             method: 'POST',
             body: JSON.stringify(createGameBody),
             headers: {
-                'Content-Type' : 'application/json'
+                'Content-Type' : 'application/json',
+                'User-Agent' : 'Tarbox/1.0.0' // TODO: get version dynamically with minimal overhead.
             }
         });
 

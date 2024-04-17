@@ -36,7 +36,9 @@ public class GamesApiRequestFilter extends OncePerRequestFilter {
             return;
         }
 
-        String[] productStringSplit = userAgent.split("/");
+        String[] userAgentSplit = userAgent.split(" ");
+        String productString = userAgentSplit[0];
+        String[] productStringSplit = productString.split("/");
 
         String product = productStringSplit[0];
 
