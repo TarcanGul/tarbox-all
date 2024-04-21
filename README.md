@@ -6,6 +6,9 @@ Tarbox is a Jackbox-like party game!
 
 Check it out at http://ec2-52-91-165-30.compute-1.amazonaws.com/ (while the link is active!)
 
+Note: If you choose to download the game from the website, in Mac, you might have to run 
+`xattr -d com.apple.quarantine Tarbox\ Desktop.app` to be able to successfully start the desktop app.
+
 ## Games
 
 ### Wordfinder
