@@ -520,6 +520,15 @@ describe('Wordfinder Tests', () => {
                     return { mocked : true }
             }
         });
+
+        globalThis.electron = {
+            tarboxRemoteProcedures: {
+                loadWordBank: () => ['word', 'bank'],
+                onQuit: () => {},
+                cleanupComplete: () => {},
+                getVersion: () => '1.0.0'
+            }
+        }
     }
 
     function clearMockMessageQueues() {

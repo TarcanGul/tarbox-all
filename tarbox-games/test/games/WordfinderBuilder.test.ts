@@ -41,7 +41,8 @@ describe('Wordfinder Builder Tests', () => {
             tarboxRemoteProcedures: {
                 loadWordBank: () => ['word', 'bank'],
                 onQuit: () => {},
-                cleanupComplete: () => {}
+                cleanupComplete: () => {},
+                getVersion: () => '1.0.0'
             }
         }
     });
