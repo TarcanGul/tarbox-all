@@ -29,6 +29,11 @@ public class GamesApiRequestFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         logger.debug("GamesApiRequestFilter is triggered for request " + request.getMethod() + " " + request.getRequestURI());
 
+        if(!request.getMethod().equals("POST")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String userAgent = request.getHeader(USER_AGENT);
 
         if(userAgent == null) {
@@ -43,7 +48,7 @@ public class GamesApiRequestFilter extends OncePerRequestFilter {
         String product = productStringSplit[0];
 
         if(!product.equalsIgnoreCase("Tarbox")) {
-            response.sendError(403, "Only Tarbox desktop clients can call into the games api.");
+            response.sendError(403, "Only Tarbox desktop clients can create a game.");
             return;
         }
 

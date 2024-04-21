@@ -99,7 +99,7 @@ export class Wordfinder {
             body: JSON.stringify(createGameBody),
             headers: {
                 'Content-Type' : 'application/json',
-                'User-Agent' : 'Tarbox/1.0.0' // TODO: get version dynamically with minimal overhead.
+                'User-Agent' : `Tarbox/${this.getCurrentRunningAppVersion()}`
             }
         });
 
@@ -462,6 +462,11 @@ export class Wordfinder {
 
     private resolvePath(path: string) : URL {
         return new URL(path, this.getBaseURL());
+    }
+
+    private getCurrentRunningAppVersion() : string {
+        // @ts-ignore
+        return globalThis.electron.tarboxRemoteProcedures.getVersion();
     }
 }
 

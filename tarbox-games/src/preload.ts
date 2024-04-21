@@ -1,4 +1,5 @@
  import {IpcRendererEvent, contextBridge, ipcRenderer} from 'electron';
+ import {app} from 'electron';
 
  contextBridge.exposeInMainWorld('electron', {
     tarboxRemoteProcedures : {
@@ -8,5 +9,6 @@
             ipcRenderer.once('quit', cb)
         } ,
         cleanupComplete: (): Promise<void> => ipcRenderer.invoke('cleanup-complete'),
+        getVersion: () => app.getVersion()
     }
  })
