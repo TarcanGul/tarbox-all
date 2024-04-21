@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import tarcan.projects.tarbox.components.SecretCodeGenerator;
+import tarcan.projects.tarbox.configurations.SecurityConfiguration;
 import tarcan.projects.tarbox.enums.GameState;
 import tarcan.projects.tarbox.enums.GameType;
 import tarcan.projects.tarbox.models.Game;
@@ -27,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 
 @WebMvcTest(GameController.class)
+@Import(SecurityConfiguration.class)
 public class GameControllerTest {
 
     @MockBean
@@ -125,6 +128,7 @@ public class GameControllerTest {
         expectedResponse.put("id", TEST_ID);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/games")
+            .header("User-Agent", "Tarbox/1.0.0")
             .content(testBody.toString())
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(MockMvcResultMatchers.status().isCreated())
