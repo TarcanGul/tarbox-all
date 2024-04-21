@@ -57,7 +57,7 @@ export const downloadConfig = {
       browser: true
     }),
     commonjs(), 
-    // terser(), 
+    terser(), 
   ],
 };
 
