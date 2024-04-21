@@ -4,6 +4,8 @@ Hello!
 
 Tarbox is a Jackbox-like party game! 
 
+Check it out at http://ec2-52-91-165-30.compute-1.amazonaws.com/ (while the link is active!)
+
 ## Games
 
 ### Wordfinder
@@ -19,3 +21,5 @@ Tarbox Games is an Electron JS Desktop Client built with Websockets (Stomp JS) a
 
 ## tarbox 
 Tarbox is an Web and Websocket Server to run games.
+
+![tarbox-website-image](/public/images/tarbox-website-demo.png)
