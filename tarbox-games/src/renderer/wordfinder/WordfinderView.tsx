@@ -78,6 +78,9 @@ enum WordfinderPage {
 
 const WordfinderView = () => {
 
+    const showMessage = useToast();
+    const id = 'wordfinder-toast';
+
     const [viewState, setViewState] : [GameState, any] = useState({ 
         page: WordfinderPage.InitialView,
         gameID: '',
@@ -95,9 +98,6 @@ const WordfinderView = () => {
 
     const viewHandler = context.viewHandlerProvider.get();
     const websocketURL = context.tarboxWebsocketURL;
-
-    const showMessage = useToast();
-    const id = 'wordfinder-toast';
 
     if(viewState.error && !showMessage.isActive(id)) {
         showMessage({

@@ -98,8 +98,7 @@ export class Wordfinder {
             method: 'POST',
             body: JSON.stringify(createGameBody),
             headers: {
-                'Content-Type' : 'application/json',
-                'User-Agent' : `Tarbox/${this.getCurrentRunningAppVersion()}`
+                'Content-Type' : 'application/json'
             }
         });
 
@@ -294,7 +293,6 @@ export class Wordfinder {
             }
         }
 
-
         const currentPicker = this.playerList[this.currentPickedIndex];
         const currentWord = this.getNextWordForRound();
         const pickedPlayerMessage = {
@@ -462,11 +460,6 @@ export class Wordfinder {
 
     private resolvePath(path: string) : URL {
         return new URL(path, this.getBaseURL());
-    }
-
-    private getCurrentRunningAppVersion() : string {
-        // @ts-ignore
-        return globalThis.electron.tarboxRemoteProcedures.getVersion();
     }
 }
 

@@ -8,7 +8,6 @@
             ipcRenderer.removeAllListeners('quit');
             ipcRenderer.once('quit', cb)
         } ,
-        cleanupComplete: (): Promise<void> => ipcRenderer.invoke('cleanup-complete'),
-        getVersion: () => app.getVersion()
+        cleanupComplete: (): Promise<void> => ipcRenderer.invoke('cleanup-complete')
     }
  })

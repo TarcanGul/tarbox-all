@@ -16,6 +16,8 @@ const createWindow = () => {
         height: 1000
     });
 
+    window.webContents.userAgent = `Tarbox/${app.getVersion()}`;
+
     window.loadFile(MAIN_PAGE);
 
     window.on('close', (e) => {
@@ -31,6 +33,10 @@ const createWindow = () => {
         const wordBankType = args[0];
         const result = await readFile(path.join(__dirname, 'data/wordfinder', wordBankType + '_word_bank.json'));
         return JSON.parse(result.toString());
+    })
+
+    ipcMain.handle('version', async (event) => {
+        return app.getVersion();
     })
     
     ipcMain.handleOnce('cleanup-complete', () => {
