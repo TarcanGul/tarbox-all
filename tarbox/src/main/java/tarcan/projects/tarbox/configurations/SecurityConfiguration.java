@@ -52,7 +52,7 @@ public class SecurityConfiguration {
 
         http
             .csrf(csrf -> csrf.disable())
-            .securityMatcher("/api/games/**")
+            .securityMatcher("/api/games")
             .addFilterBefore(gameRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
